@@ -1,0 +1,189 @@
+body {
+  font-family: Arial, sans-serif;
+  background-color: #f4f4f4;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+.card {
+  width: 60%;
+  background: #ffffff;
+  padding: 100px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  text-align: center;
+  transition: 0.3s;
+  justify-content: center;
+}
+
+.card:hover {
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.3);
+}
+
+.card .employee-form {
+  margin-bottom: 20px;
+}
+
+.card .employee-form h1 {
+  font-size: 26px;
+  color: #333;
+  margin-bottom: 15px;
+}
+
+
+.card .employee-form input {
+  width: 95%;
+  padding: 10px;
+  margin: 8px 0;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 16px;
+  transition: border 0.3s;
+}
+
+.card .employee-form input:focus {
+  border-color: #007bff;
+  outline: none;
+}
+
+.card .employee-form button {
+  width: 100%;
+  background-color: #28a745;
+  color: white;
+  padding: 12px;
+  font-size: 18px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.card .employee-form button:hover {
+  background-color: #218838;
+}
+
+.card .employee-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+
+.card .employee-table th,
+.card .employee-table td {
+  border: 1px solid #ddd;
+  padding: 10px;
+  text-align: center;
+}
+
+.card .employee-table th {
+  background-color: #007bff;
+  color: white;
+}
+
+.card .employee-table tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+.card .employee-table input[type="text"] {
+  padding: 5px;
+  width: 90%;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.card button {
+  padding: 8px 12px;
+  border: none;
+  cursor: pointer;
+  border-radius: 5px;
+  font-size: 14px;
+  transition: 0.3s;
+  margin: 5px;
+}
+
+/* Employee List Styling */
+.card .employee-list {
+  margin-top: 20px;
+}
+
+/* Table Styling */
+.card .employee-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+  background: white;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.card .employee-table th,
+.card .employee-table td {
+  border: 1px solid #ddd;
+  padding: 12px;
+  text-align: center;
+  font-size: 16px;
+}
+
+.card .employee-table th {
+  background-color: #007bff;
+  color: white;
+  font-weight: bold;
+}
+
+.card .employee-table tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+/* Edit Mode Input Fields */
+.card .employee-table input[type="text"] {
+  padding: 5px;
+  width: 90%;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+/* Action Buttons */
+.card .employee-table button {
+  padding: 8px 12px;
+  border: none;
+  cursor: pointer;
+  border-radius: 5px;
+  font-size: 14px;
+  transition: 0.3s;
+  margin: 5px;
+}
+
+/* Edit Button */
+.card .employee-table .edit-btn {
+  background-color: #ffc107;
+  color: black;
+}
+
+.card .employee-table .edit-btn:hover {
+  background-color: #e0a800;
+}
+
+/* Save Button */
+.card .employee-table .save-btn {
+  background-color: #17a2b8;
+  color: white;
+}
+
+.card .employee-table .save-btn:hover {
+  background-color: #138496;
+}
+
+/* Delete Button */
+.card .employee-table .delete-btn {
+  background-color: #dc3545;
+  color: white;
+}
+
+.card .employee-table .delete-btn:hover {
+  background-color: #c82333;
+}
