@@ -1,0 +1,11 @@
+.org-scroll {
+  width: 100%;
+  overflow-x: auto;         /* ✅ horizontal scroll */
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch; /* smooth on mobile */
+}
+
+.org-inner {
+  width: max-content;       /* expand to chart's natural width */
+  min-height: 1px;          /* keeps container stable */
+}

@@ -1,0 +1,185 @@
+<p-toast></p-toast>
+
+<form [formGroup]="userForm" (ngSubmit)="onSubmit()" class="p-fluid formgrid grid">
+  <!-- USER ID -->
+  <div class="field col-12 md:col-4 mb-4">
+    <p-floatLabel variant="on">
+      <input id="user_id" type="text" pInputText formControlName="user_id" />
+      <label for="user_id">User ID</label>
+    </p-floatLabel>
+  </div>
+
+  <!-- CTC + Month Range -->
+  <div class="field col-12 md:col-4 mb-4">
+    <p-floatLabel variant="on">
+      <input id="ctc" type="number" pInputText formControlName="ctc" />
+      <label for="ctc">Configured Monthly CTC (₹)</label>
+    </p-floatLabel>
+  </div>
+
+  <div class="field col-12 md:col-4 mb-4">
+    <p-floatLabel variant="on">
+      <input id="createdMonth" type="month" pInputText formControlName="createdMonth" />
+      <label for="createdMonth">Created Month</label>
+    </p-floatLabel>
+  </div>
+
+  <div class="field col-12 md:col-4 mb-4">
+    <p-floatLabel variant="on">
+      <input id="untilMonth" type="month" pInputText formControlName="untilMonth" />
+      <label for="untilMonth">Until Month</label>
+    </p-floatLabel>
+  </div>
+
+  <!-- Allowances -->
+  <div class="col-12">
+    <h3>Allowances (as % of Gross – Basic auto ≥ 40%)</h3>
+
+    <div class="field-checkbox" *ngFor="let item of allowanceItems">
+      <p-checkbox
+        [formControlName]="item.key + 'Enabled'"
+        binary="true"
+        [inputId]="item.key"
+      ></p-checkbox>
+
+      <label [for]="item.key" class="ml-2">{{ item.label }}</label>
+
+      <input
+        *ngIf="userForm.get(item.key + 'Enabled')?.value"
+        type="number"
+        pInputText
+        [formControlName]="item.key + 'Percent'"
+        placeholder="%"
+        class="ml-2 w-3"
+      />
+    </div>
+  </div>
+
+  <!-- Deductions & Contributions -->
+  <div class="col-12 mt-3">
+    <h3>Deductions & Statutory Contributions</h3>
+
+    <div class="field-checkbox">
+      <p-checkbox formControlName="pfEnabled" binary="true" inputId="pf"></p-checkbox>
+      <label for="pf" class="ml-2">
+        Provident Fund (PF) – Auto (12% of Basic, capped at ₹1800 if Basic &gt; ₹15,000)
+      </label>
+    </div>
+
+    <div class="field-checkbox">
+      <p-checkbox formControlName="ptEnabled" binary="true" inputId="pt"></p-checkbox>
+      <label for="pt" class="ml-2">Professional Tax (PT)</label>
+      <input
+        *ngIf="userForm.get('ptEnabled')?.value"
+        type="number"
+        pInputText
+        formControlName="ptPercent"
+        placeholder="% of CTC"
+        class="ml-2 w-3"
+      />
+    </div>
+
+    <div class="field-checkbox">
+      <p-checkbox formControlName="tdsEnabled" binary="true" inputId="tds"></p-checkbox>
+      <label for="tds" class="ml-2">Income Tax (TDS)</label>
+      <input
+        *ngIf="userForm.get('tdsEnabled')?.value"
+        type="number"
+        pInputText
+        formControlName="tdsPercent"
+        placeholder="% of CTC"
+        class="ml-2 w-3"
+      />
+    </div>
+
+    <div class="field-checkbox">
+      <p-checkbox formControlName="esicEmployerEnabled" binary="true" inputId="esicEmployer"></p-checkbox>
+      <label for="esicEmployer" class="ml-2">
+        Employer ESIC Contribution (3.25% of Gross if Gross &lt; ₹21,000)
+      </label>
+    </div>
+
+    <div class="field-checkbox">
+      <p-checkbox formControlName="esicEmployeeEnabled" binary="true" inputId="esicEmployee"></p-checkbox>
+      <label for="esicEmployee" class="ml-2">
+        Employee ESIC Contribution (0.75% of Gross if Gross &lt; ₹21,000)
+      </label>
+    </div>
+  </div>
+
+  <!-- Total Allowance % -->
+  <div class="col-12 mt-3 font-semibold text-lg" [ngStyle]="{ color: totalPercent === 100 ? 'green' : 'red' }">
+    Total Allowances % : {{ totalPercent }}%
+  </div>
+
+  <!-- Buttons -->
+  <div class="col-12 flex flex-wrap gap-3 mt-4 justify-content-end">
+    <button
+      pButton
+      type="button"
+      label="Calculate & Preview"
+      icon="pi pi-calculator"
+      class="p-button-info"
+      (click)="onCalculatePreview()"
+    ></button>
+
+    <button
+      pButton
+      type="submit"
+      label="Submit"
+      icon="pi pi-check"
+      [disabled]="userForm.invalid || totalPercent !== 100"
+      class="p-button-success"
+    ></button>
+  </div>
+</form>
+
+<!-- Preview Table -->
+<div *ngIf="showPreview" class="mt-5">
+  <p-table [value]="salaryBreakdown">
+    <ng-template pTemplate="header">
+      <tr>
+        <th>Component</th>
+        <th>%</th>
+        <th>Monthly (₹)</th>
+        <th>Annual (₹)</th>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="body" let-item>
+      <tr
+        [ngClass]="{
+          'allowance-row': item.type === 'allowance',
+          'deduction-row': item.type === 'deduction',
+          'employer-row': item.type === 'employer',
+          'total-row': item.type === 'total'
+        }"
+      >
+        <td>{{ item.component }}</td>
+
+        <!-- ✅ Fix for null/undefined percent -->
+        <td>
+          <ng-container *ngIf="item.percent != null; else dash">
+            {{ item.percent | number: '1.0-2' }}%
+          </ng-container>
+          <ng-template #dash>-</ng-template>
+        </td>
+
+        <td>{{ item.monthly | number: '1.0-0' }}</td>
+        <td>{{ item.annual | number: '1.0-0' }}</td>
+      </tr>
+    </ng-template>
+  </p-table>
+
+  <!-- Summary -->
+  <div *ngIf="netSalarySummary" class="mt-4">
+    <h4>Summary</h4>
+    <p><strong>Configured CTC (Input):</strong> {{ netSalarySummary.configuredCtc | number: '1.0-0' }}</p>
+    <p><strong>Gross Salary (Monthly):</strong> {{ netSalarySummary.gross | number: '1.0-0' }}</p>
+    <p><strong>Total Employee Deductions:</strong> {{ netSalarySummary.totalEmployeeDeductions | number: '1.0-0' }}</p>
+    <p><strong>Net Salary (Take-home):</strong> {{ netSalarySummary.netSalary | number: '1.0-0' }}</p>
+    <p><strong>Employer PF:</strong> {{ netSalarySummary.employerPf | number: '1.0-0' }}</p>
+    <p><strong>Employer ESIC:</strong> {{ netSalarySummary.employerEsic | number: '1.0-0' }}</p>
+    <p><strong>Computed Employer Cost (CTC style):</strong> {{ netSalarySummary.computedEmployerCost | number: '1.0-0' }}</p>
+  </div>
+</div>

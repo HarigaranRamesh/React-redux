@@ -1,0 +1,224 @@
+<p-toast></p-toast>
+
+<div class="card">
+  <h3>Leave Bucket Editor</h3>
+
+  <!-- USER AUTOCOMPLETE -->
+  <div class="mb-3">
+    <label class="block mb-2 font-semibold">Select User</label>
+
+    <p-autoComplete
+      [(ngModel)]="selectedUser"
+      [suggestions]="filteredUsers"
+      (completeMethod)="filterUsers($event)"
+      (onSelect)="onUserSelect()"
+      [dropdown]="true"
+      [forceSelection]="true"
+      optionLabel="user_name"
+      placeholder="Search user..."
+    >
+      <ng-template let-u pTemplate="item">
+        <div class="flex flex-column">
+          <div class="font-semibold">{{ u.user_name }}</div>
+          <small class="text-500">{{ u.email }} • {{ u.empId }}</small>
+        </div>
+      </ng-template>
+
+      <ng-template let-u pTemplate="selectedItem">
+        <span>{{ u?.user_name }}</span>
+      </ng-template>
+    </p-autoComplete>
+  </div>
+
+  <!-- LEAVE TYPES TABLE -->
+  <div *ngIf="leaveDocs.length" class="mt-4">
+    <div class="flex align-items-center justify-content-between">
+      <h4 class="m-0">Leave Types</h4>
+
+      <!-- <button
+        pButton
+        type="button"
+        [label]="createMode ? 'Close' : 'Add New'"
+        icon="pi pi-plus"
+        (click)="toggleCreate()"
+      ></button> -->
+    </div>
+
+    <p-table [value]="leaveDocs" class="mt-2">
+      <ng-template pTemplate="header">
+        <tr>
+          <th>Type</th>
+          <th>Accrual</th>
+          <th>Value</th>
+          <th style="width: 160px;">Action</th>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="body" let-row>
+        <tr [class]="selectedLeaveDoc?._id === row._id ? 'bg-primary-50' : ''">
+          <td>{{ row.label }}</td>
+          <td>{{ row.accrualType }}</td>
+          <td>{{ row.value }}</td>
+          <td>
+            <button
+              pButton
+              type="button"
+              label="Edit"
+              icon="pi pi-pencil"
+              (click)="selectLeaveDoc(row)"
+            ></button>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+
+  <!-- CREATE NEW LEAVE TYPE -->
+  <div *ngIf="selectedUser?._id && createMode" class="mt-4">
+    <h4>Add Leave Type</h4>
+
+    <div class="grid mt-2">
+      <!-- Policy dropdown -->
+      <div class="col-12 md:col-4">
+        <label class="block mb-2 font-semibold">Policy (Optional)</label>
+        <p-dropdown
+          [options]="defaultPolicyOptions"
+          [(ngModel)]="newLeave.label"
+          placeholder="Select policy or type below"
+          class="w-full"
+        ></p-dropdown>
+        <small class="text-500">You can also type a custom leave name.</small>
+      </div>
+
+      <!-- Custom name -->
+      <div class="col-12 md:col-4">
+        <label class="block mb-2 font-semibold">Leave Name</label>
+        <input
+          type="text"
+          class="p-inputtext p-component w-full"
+          [(ngModel)]="newLeave.label"
+          placeholder="e.g., Paternity Leave"
+        />
+      </div>
+
+      <!-- Accrual -->
+      <div class="col-12 md:col-4">
+        <label class="block mb-2 font-semibold">Accrual Type</label>
+        <p-dropdown
+          [options]="accrualOptions"
+          [(ngModel)]="newLeave.accrualType"
+          class="w-full"
+        ></p-dropdown>
+      </div>
+
+      <!-- Year -->
+      <div class="col-12 md:col-4">
+        <label class="block mb-2 font-semibold">Year</label>
+        <input
+          type="number"
+          class="p-inputtext p-component w-full"
+          [(ngModel)]="newLeave.year"
+        />
+      </div>
+
+      <!-- Month (only if not annual) -->
+      <div class="col-12 md:col-4" *ngIf="newLeave.accrualType !== 'annual'">
+        <label class="block mb-2 font-semibold">Month</label>
+        <p-dropdown
+          [options]="months"
+          [(ngModel)]="newLeave.month"
+          class="w-full"
+        ></p-dropdown>
+      </div>
+
+      <!-- Initial value -->
+      <div class="col-12 md:col-4">
+        <label class="block mb-2 font-semibold">
+          {{ newLeave.accrualType === 'annual' ? 'Annual Value' : 'Initial Month Value' }}
+        </label>
+        <input
+          type="number"
+          class="p-inputtext p-component w-full"
+          [(ngModel)]="newLeave.initialValue"
+        />
+      </div>
+    </div>
+
+    <div class="flex justify-content-end mt-3">
+      <button
+        pButton
+        type="button"
+        label="Create"
+        icon="pi pi-check"
+        [loading]="saving"
+        (click)="onCreateLeaveType()"
+      ></button>
+    </div>
+  </div>
+
+  <!-- EDIT PANEL -->
+  <div *ngIf="selectedLeaveDoc" class="mt-4">
+    <h4>Edit: {{ selectedLeaveDoc.label }}</h4>
+
+    <div class="grid mt-2">
+      <!-- ACCRUAL TYPE -->
+      <div class="col-12 md:col-4">
+        <label class="block mb-2 font-semibold">Accrual Type</label>
+        <p-dropdown
+          [options]="accrualOptions"
+          [(ngModel)]="selectedAccrual"
+          (onChange)="onAccrualChange()"
+          placeholder="Select accrual type"
+          class="w-full"
+        ></p-dropdown>
+      </div>
+
+      <!-- YEAR -->
+      <div class="col-12 md:col-4">
+        <label class="block mb-2 font-semibold">Year</label>
+        <p-dropdown
+          [options]="years"
+          [(ngModel)]="selectedYear"
+          (onChange)="onYearChange()"
+          placeholder="Select year"
+          class="w-full"
+        ></p-dropdown>
+      </div>
+
+      <!-- MONTH -->
+      <div class="col-12 md:col-4" *ngIf="selectedAccrual !== 'annual'">
+        <label class="block mb-2 font-semibold">Month</label>
+        <p-dropdown
+          [options]="months"
+          [(ngModel)]="selectedMonth"
+          (onChange)="onMonthChange()"
+          placeholder="Select month"
+          class="w-full"
+        ></p-dropdown>
+      </div>
+
+      <!-- VALUE monthly/fixed -->
+      <div class="col-12 md:col-4" *ngIf="selectedAccrual !== 'annual'">
+        <label class="block mb-2 font-semibold">Month Value</label>
+        <input type="number" class="p-inputtext p-component w-full" [(ngModel)]="monthValue" />
+      </div>
+
+      <!-- VALUE annual -->
+      <div class="col-12 md:col-4" *ngIf="selectedAccrual === 'annual'">
+        <label class="block mb-2 font-semibold">Annual Value</label>
+        <input type="number" class="p-inputtext p-component w-full" [(ngModel)]="annualValue" />
+      </div>
+    </div>
+
+    <div class="flex justify-content-end mt-3">
+      <button
+        pButton
+        type="button"
+        label="Save"
+        icon="pi pi-save"
+        [loading]="saving"
+        (click)="onSave()"
+      ></button>
+    </div>
+  </div>
+</div>

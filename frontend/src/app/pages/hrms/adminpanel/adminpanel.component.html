@@ -1,0 +1,73 @@
+<p-toast></p-toast>
+
+<!-- Admin dashboard -->
+<div class="grid p-3 gap-3" *ngIf="isAdminOrSuperAdmin; else profileView">
+  <!-- Total Employees -->
+  <div class="col-12 sm:col-6 md:col-4 lg:col-2">
+    <p-card>
+      <h6>Total Employees</h6>
+      <p class="text-2xl font-bold">{{ totalEmployees }}</p>
+    </p-card>
+  </div>
+
+  <!-- Active Employees -->
+  <div class="col-12 sm:col-6 md:col-4 lg:col-2">
+    <p-card>
+      <h6>Active Employees</h6>
+      <p class="text-2xl font-bold text-green-500">{{ activeEmployees }}</p>
+    </p-card>
+  </div>
+
+  <!-- Inactive Employees -->
+  <div class="col-12 sm:col-6 md:col-4 lg:col-2">
+    <p-card>
+      <h6>Inactive Employees</h6>
+      <p class="text-2xl font-bold text-red-500">{{ inactiveEmployees }}</p>
+    </p-card>
+  </div>
+
+  <!-- Present Today -->
+  <div class="col-12 sm:col-6 md:col-4 lg:col-2">
+    <p-card>
+      <h6>Present Today</h6>
+      <p class="text-2xl font-bold text-blue-500">{{ presentToday }}</p>
+    </p-card>
+  </div>
+
+  <!-- Absent Today -->
+  <div class="col-12 sm:col-6 md:col-4 lg:col-2">
+    <p-card>
+      <h6>Absent Today</h6>
+      <p class="text-2xl font-bold text-orange-500">{{ absentToday }}</p>
+    </p-card>
+  </div>
+</div>
+
+<!-- Employee profile view -->
+<ng-template #profileView>
+  <!-- Top actions row -->
+  <!-- <div class="flex justify-content-end gap-2 p-3">
+    <button
+      pButton
+      label="Change Password"
+      icon="pi pi-key"
+      class="p-button-warning"
+      (click)="openChangePassword()"
+    ></button>
+  </div> -->
+
+  <!-- Profile component -->
+  <app-employee-profile></app-employee-profile>
+</ng-template>
+
+<!-- Change Password Dialog -->
+<p-dialog
+  header="Change Password"
+  [(visible)]="showChangePassword"
+  [modal]="true"
+  [style]="{ width: '480px' }"
+  [draggable]="false"
+  [resizable]="false"
+>
+
+</p-dialog>

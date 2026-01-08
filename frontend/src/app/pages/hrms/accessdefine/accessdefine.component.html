@@ -1,0 +1,93 @@
+<div class="surface-card shadow-2 border-round p-3">
+  <div class="flex align-items-end gap-3 mb-4">
+    <div class="flex-1">
+      <label class="block mb-2 text-sm text-500">Select Role</label>
+      <p-dropdown
+        [options]="roles"
+        optionLabel="role"
+        optionValue="_id"
+        [(ngModel)]="selectedRoleId"
+        placeholder="Choose a role"
+        (onChange)="onRoleChange()">
+      </p-dropdown>
+    </div>
+
+    <button pButton label="Save" icon="pi pi-save" (click)="saveMain()" [disabled]="!selectedRoleId"></button>
+  </div>
+
+  <!-- Menus PickList -->
+  <div class="grid">
+    <div class="col-12 lg:col-7">
+      <h5 class="mb-2">Menus</h5>
+      <p-pickList
+        [source]="menusSource"
+        [target]="menusTarget"
+        sourceHeader="Available"
+        targetHeader="Selected"
+        [showSourceControls]="true"
+        [showTargetControls]="true"
+        (onMoveToTarget)="onMenusMove()"
+        (onMoveToSource)="onMenusMove()"
+        (onMoveAllToTarget)="onMenusMove()"
+        (onMoveAllToSource)="onMenusMove()"
+        [dragdrop]="true"
+        [responsive]="true"
+        [metaKeySelection]="false"
+        [sourceStyle]="{ height: '320px' }"
+        [targetStyle]="{ height: '320px' }"
+      >
+        <ng-template let-menu pTemplate="item">
+          <div class="flex align-items-center justify-content-between w-full">
+            <div class="font-medium">{{ menu.menuName }}</div>
+            <button
+              type="button"
+              class="p-button p-button-text p-0 text-xs"
+              (click)="onTargetMenuClick(menusTarget.indexOf(menu)); $event.stopPropagation()">
+              Manage Children
+            </button>
+          </div>
+        </ng-template>
+      </p-pickList>
+
+      <div class="flex align-items-center gap-2 mt-3">
+        <input type="text" pInputText placeholder="Add new menu name" [(ngModel)]="newMenuName" />
+        <button pButton label="Add Menu" icon="pi pi-plus" (click)="addMenu()"></button>
+      </div>
+    </div>
+
+    <!-- Children PickList -->
+    <div class="col-12 lg:col-5">
+      <h5 class="mb-2">
+        Children
+        <span class="text-600 ml-2" *ngIf="selectedMenuIndex != null">for <b>{{ menusTarget[selectedMenuIndex]?.menuName }}</b></span>
+      </h5>
+
+      <p-pickList
+        [source]="childSource"
+        [target]="childTarget"
+        sourceHeader="Available"
+        targetHeader="Selected"
+        [showSourceControls]="true"
+        [showTargetControls]="true"
+        (onMoveToTarget)="onChildrenMove()"
+        (onMoveToSource)="onChildrenMove()"
+        (onMoveAllToTarget)="onChildrenMove()"
+        (onMoveAllToSource)="onChildrenMove()"
+        [dragdrop]="true"
+        [responsive]="true"
+        [metaKeySelection]="false"
+        [sourceStyle]="{ height: '320px' }"
+        [targetStyle]="{ height: '320px' }"
+      >
+        <ng-template let-item pTemplate="item">
+          <div class="w-full">{{ item.submenuName }}</div>
+        </ng-template>
+      </p-pickList>
+
+      <div class="flex align-items-center gap-2 mt-3">
+        <input type="text" pInputText placeholder="Add new submenu" [(ngModel)]="newChildName" />
+        <button pButton label="Add Submenu" icon="pi pi-plus" (click)="addChild()" [disabled]="selectedMenuIndex==null"></button>
+      </div>
+    </div>
+  </div>
+</div>

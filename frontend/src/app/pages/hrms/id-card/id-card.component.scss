@@ -1,0 +1,61 @@
+.container {
+    text-align: center;
+  }
+
+  .certificate {
+    width: 400px;
+    height: 640px;
+    padding: 20px;
+    background: url('./image.png') no-repeat center center; // Replace with your uploaded path
+    background-size: cover;
+    position: relative;
+    margin: auto;
+    font-family: 'Arial';
+    color: #000;
+  }
+
+  .certificateBack {
+    width: 400px;
+    height: 640px;
+    padding: 20px;
+    background: url('./backImage.png') no-repeat center center; // Replace with your uploaded path
+    background-size: cover;
+    position: relative;
+    margin: auto;
+    font-family: 'Arial';
+    color: #000;
+  }
+
+  .photo {
+      width: 120px;
+    height: 120px;
+    object-fit: cover;
+    border: 6px #100f0f;
+    display: block;
+    margin: 199px auto 20px;
+}
+
+
+  .username {
+    font-size: 22px;
+    font-weight: bold;
+    color: #e57373;
+    margin: 10px 0 0;
+  }
+
+  .role {
+    font-size: 14px;
+    margin-bottom: 20px;
+  }
+
+  .info {
+    text-align: center;
+    margin: 0 auto;
+    width: 80%;
+    font-size: 12px;
+    line-height: 0.5;
+  }
+  .info p{
+    margin: 0 0 1rem 0;
+    line-height: 0.5;
+  }

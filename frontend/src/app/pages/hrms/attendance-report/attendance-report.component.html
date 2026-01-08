@@ -1,0 +1,38 @@
+<p-tabView>
+    <!-- ✅ Leave Requests List Tab -->
+    <p-tabPanel header="My Daily Attendance">
+        <p-table [value]="dailyAttendance" [paginator]="true" [rows]="5" responsiveLayout="scroll">
+            <ng-template pTemplate="header">
+                <tr>
+                    <th>Date</th>
+                    <th>Leave Type</th>
+                    <th>Clocked in</th>
+                    <th>Clocked in Time</th>
+                    <th>Clocked out</th>
+                    <th>Clocked out Time</th>
+                    <th>Remarks</th>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-request>
+                <tr>
+                    <td>{{ request.date | date: 'dd/MM/yyyy' }}</td>
+                    <td>{{ request.attendanceType }}</td>
+                    <td>
+                        <span *ngIf="request.geoTaglogin.login === true" class="text-green-500">Clocked In </span>
+                        <span *ngIf="request.geoTaglogin.login === false" class="text-red-500">-</span>
+                    </td>
+                    <td>{{ request.geoTaglogin.date ? (request.geoTaglogin.date | date: 'medium') : '-' }}</td>
+
+                    <td>
+                        <span *ngIf="request.geoTaglogout.logout === true" class="text-green-500">Clocked Out</span>
+                        <span *ngIf="request.geoTaglogout.logout === false" class="text-red-500">-</span>
+                    </td>
+                    <td>{{ request.geoTaglogout.date ? (request.geoTaglogout.date | date: 'medium') : '-' }}</td>
+                    <td>{{ request.remarks }}</td>
+                </tr>
+            </ng-template>
+        </p-table>
+    </p-tabPanel>
+</p-tabView>
+
+<p-toast></p-toast>

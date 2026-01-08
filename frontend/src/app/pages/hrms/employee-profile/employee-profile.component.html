@@ -1,0 +1,270 @@
+<p-toast></p-toast>
+<p-confirmDialog></p-confirmDialog>
+
+<div class="surface-card border-round-2xl overflow-hidden shadow-2 w-full">
+    <!-- Cover -->
+    <div class="relative w-full h-48 md:h-64 bg-cover bg-center" [ngStyle]="{ 'background-image': coverStyle() }">
+        <div class="absolute inset-0" style="background: linear-gradient(180deg, rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.5))"></div>
+
+        <!-- Avatar + name row -->
+        <div class="absolute bottom-0 left-0 right-0 p-4 md:p-6 flex flex-wrap items-end gap-4">
+            <p-avatar [image]="getProfilePhoto()" shape="circle" size="xlarge" styleClass="ring-4 ring-white shadow-3" [style]="{ 'width.px': 96, 'height.px': 96 }"> </p-avatar>
+
+            <div class="text-white flex-1 min-w-200">
+                <div class="text-2xl md:text-3xl font-semibold leading-none">{{ profile()?.user_name || 'Employee' }}</div>
+                <div class="mt-2 opacity-90">
+                    <span class="font-medium">{{ profile()?.position || '—' }}</span>
+                    <span *ngIf="profile()?.department"> · {{ profile()?.department }}</span>
+                </div>
+                <div class="mt-1 text-sm opacity-80">
+                    <span *ngIf="profile()?.location">{{ profile()?.location }} · </span>
+                    <span>Employee ID: {{ profile()?.empId || '—' }}</span>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-2 ml-auto">
+                <p-tag [value]="profile()?.status ? 'Active' : 'Inactive'" [severity]="profile()?.status ? 'success' : 'danger'"></p-tag>
+
+                <!-- Change Password -->
+                <button pButton size="small" label="Change Password" icon="pi pi-key" class="p-button-help" (click)="openChangePassword()"></button>
+
+                <!-- Clock In -->
+                <button *ngIf="!checkStatus" pButton size="small" [label]="isHoliday ? 'Holiday Clock In' : 'Clock In'" icon="pi pi-sign-in" class="p-button-success" [disabled]="loading" (click)="clockIn()"></button>
+
+                <!-- Clock Out -->
+                <button *ngIf="checkStatus" pButton size="small" [label]="isHoliday ? 'Holiday Clock Out' : 'Clock Out'" icon="pi pi-sign-out" class="p-button-danger" [disabled]="loading" (click)="confirmClockOut()"></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 🔐 Change Password Dialog -->
+    <p-dialog header="Change Password" [(visible)]="showChangePwd" [modal]="true" [closable]="!submittingPwd" [style]="{ width: '420px', maxWidth: '95vw' }">
+        <form [formGroup]="pwdForm" (ngSubmit)="submitChangePassword()" class="flex flex-column gap-3">
+            <div class="flex flex-column gap-1">
+                <label class="text-sm">Current Password</label>
+                <p-password formControlName="currentPassword" [toggleMask]="true" [feedback]="false" [inputStyle]="{ width: '100%' }"> </p-password>
+                <small class="p-error" *ngIf="pwdForm.get('currentPassword')?.touched && pwdForm.get('currentPassword')?.hasError('required')"> Current password is required </small>
+            </div>
+
+            <div class="flex flex-column gap-1">
+                <label class="text-sm">New Password</label>
+                <p-password formControlName="newPassword" [toggleMask]="true" [feedback]="true" [promptLabel]="'Enter a password'" [weakLabel]="'Weak'" [mediumLabel]="'Medium'" [strongLabel]="'Strong'" [inputStyle]="{ width: '100%' }"> </p-password>
+                <small class="p-error" *ngIf="pwdForm.get('newPassword')?.touched && pwdForm.get('newPassword')?.hasError('required')"> New password is required </small>
+                <small class="p-error" *ngIf="pwdForm.get('newPassword')?.touched && pwdForm.get('newPassword')?.hasError('minlength')"> Minimum 8 characters </small>
+            </div>
+
+            <div class="flex flex-column gap-1">
+                <label class="text-sm">Confirm New Password</label>
+                <p-password formControlName="confirmPassword" [toggleMask]="true" [feedback]="false" [inputStyle]="{ width: '100%' }"> </p-password>
+                <small class="p-error" *ngIf="pwdForm.get('confirmPassword')?.touched && (pwdForm.get('confirmPassword')?.hasError('required') || pwdForm.hasError('mismatch'))"> Passwords must match </small>
+            </div>
+
+            <div class="flex justify-end gap-2 pt-2">
+                <button type="button" pButton label="Cancel" class="p-button-text" (click)="showChangePwd = false" [disabled]="submittingPwd"></button>
+                <button type="submit" pButton label="Update" icon="pi pi-check" [disabled]="submittingPwd || pwdForm.invalid"></button>
+            </div>
+        </form>
+    </p-dialog>
+
+    <!-- Quick stats + reminders -->
+    <div class="grid p-3 md:p-4 gap-3">
+        <!-- Stats Row -->
+        <div class="col-12 md:col-2">
+            <p-card>
+                <div class="text-sm text-muted-color">Present (This Month)</div>
+                <div class="text-3xl font-bold">{{ attendance()?.presentDays ?? '—' }}</div>
+            </p-card>
+        </div>
+        <div class="col-12 md:col-2">
+            <p-card>
+                <div class="text-sm text-muted-color">Absent (This Month)</div>
+                <div class="text-3xl font-bold text-red-500">{{ attendance()?.absentDays ?? '—' }}</div>
+            </p-card>
+        </div>
+        <div class="col-12 md:col-2">
+            <p-card>
+                <div class="text-sm text-muted-color">Late Marks (This Month)</div>
+                <div class="text-3xl font-bold text-orange-500">{{ attendance()?.lateMarks ?? 0 }}</div>
+            </p-card>
+        </div>
+        <div class="col-12 md:col-2">
+            <p-card>
+                <div class="text-sm text-muted-color">Balance Petrol Credit</div>
+                <div class="text-3xl font-bold">{{ petrolBalance() | currency: 'INR' }}</div>
+            </p-card>
+        </div>
+
+        <!-- Reminders Row -->
+        <div class="col-12 md:col-6">
+            <p-card class="bg-yellow-100 border-round-lg shadow-2">
+                <h5 class="text-yellow-800">Login Reminder</h5>
+                <p class="text-sm text-gray-700">Please make sure to <strong>login before 11:01 AM</strong>. Failure to do so will mark your attendance as <strong>Absent / LOP</strong>.</p>
+            </p-card>
+        </div>
+
+        <div class="col-12 md:col-6">
+            <p-card class="bg-blue-100 border-round-lg shadow-2">
+                <h5 class="text-blue-800">Logout Reminder</h5>
+                <p class="text-sm text-gray-700">Please ensure to <strong>logout before 11:59 PM</strong> to complete your attendance record for the day.</p>
+            </p-card>
+        </div>
+    </div>
+
+    <p-divider class="my-0"></p-divider>
+
+    <!-- Tabs -->
+    <div class="p-3 md:p-4">
+        <p-tabView>
+            <!-- About -->
+            <p-tabPanel header="About">
+                <div class="grid">
+                    <div class="col-12 md:col-8">
+                        <p-card>
+                            <h3 class="mb-2">Bio</h3>
+                            <p class="text-700 whitespace-pre-line">{{ profile()?.bio || '—' }}</p>
+                            <div class="mt-3">
+                                <h4 class="mb-2">Contact</h4>
+                                <div class="text-sm">
+                                    <div><i class="pi pi-envelope mr-2"></i>{{ profile()?.email || '—' }}</div>
+                                    <div><i class="pi pi-phone mr-2"></i>{{ profile()?.mobile_no || '—' }}</div>
+                                    <div *ngIf="profile()?.managerName"><i class="pi pi-user mr-2"></i>Manager: {{ profile()?.managerName }}</div>
+                                    <div><i class="pi pi-calendar mr-2"></i>Joined: {{ profile()?.doj | date: 'mediumDate' }}</div>
+                                </div>
+                            </div>
+                        </p-card>
+                    </div>
+                    <div class="col-12 md:col-4">
+                        <p-card>
+                            <h3 class="mb-3">Skills</h3>
+                            <div class="flex flex-wrap gap-2">
+                                <p-chip *ngFor="let s of profile()?.skills || []" [label]="s"></p-chip>
+                                <span *ngIf="!profile()?.skills?.length" class="text-700">—</span>
+                            </div>
+
+                           <h3 class="mt-4 mb-3">Leave Balances</h3>
+
+<div class="flex flex-col gap-2">
+
+  <div *ngFor="let l of leaves()"
+       class="flex justify-between items-center p-2 surface-100 border-round">
+
+    <!-- Leave Type -->
+    <span class="font-medium">
+      {{ l.type }}
+    </span>
+
+    <!-- Balance + Tag -->
+    <div class="text-right leading-tight">
+      <span class="text-xl font-bold block">
+        {{ l.balance }}
+      </span>
+      <span class="text-700 text-sm">
+        {{ l.tag }}
+      </span>
+    </div>
+
+  </div>
+
+  <!-- No Data Case -->
+  <span *ngIf="!leaves().length"
+        class="text-700 text-center p-2">
+    —
+  </span>
+
+</div>
+
+                        </p-card>
+                    </div>
+                </div>
+            </p-tabPanel>
+
+            <!-- Attendance -->
+            <p-tabPanel header="Attendance">
+                <p-card>
+                    <h3 class="mb-3">This Month</h3>
+                    <div class="grid">
+                        <div class="col-6 md:col-3">
+                            <div class="p-3 border-1 surface-border border-round">
+                                <div class="text-sm text-muted-color">Present</div>
+                                <div class="text-2xl font-bold">{{ attendance()?.presentDays ?? '—' }}</div>
+                            </div>
+                        </div>
+                        <div class="col-6 md:col-3">
+                            <div class="p-3 border-1 surface-border border-round">
+                                <div class="text-sm text-muted-color">Absent</div>
+                                <div class="text-2xl font-bold text-red-500">{{ attendance()?.absentDays ?? '—' }}</div>
+                            </div>
+                        </div>
+                        <div class="col-6 md:col-3">
+                            <div class="p-3 border-1 surface-border border-round">
+                                <div class="text-sm text-muted-color">Late Marks</div>
+                                <div class="text-2xl font-bold text-orange-500">{{ attendance()?.lateMarks ?? 0 }}</div>
+                            </div>
+                        </div>
+                    </div>
+                </p-card>
+            </p-tabPanel>
+
+            <!-- Leaves -->
+            <p-tabPanel header="Leaves">
+                <p-card>
+                    <h3 class="mb-3">Leave Breakdown</h3>
+                    <p-table [value]="leaves()" [tableStyle]="{ 'min-width': '28rem' }" [paginator]="false">
+                        <ng-template pTemplate="header">
+                            <tr>
+                                <th>Type</th>
+                                <th class="text-right">Balance</th>
+                            </tr>
+                        </ng-template>
+                        <ng-template pTemplate="body" let-row>
+                            <tr>
+                                <td>{{ row.type }}</td>
+                                <td class="text-right">
+                                    <span [style.color]="row.color || null" class="font-bold">{{ row.balance }}</span>
+                                </td>
+                            </tr>
+                        </ng-template>
+                    </p-table>
+                </p-card>
+            </p-tabPanel>
+
+            <!-- Projects -->
+            <p-tabPanel header="Projects">
+                <p-card>
+                    <p-table [value]="projects()" [paginator]="false">
+                        <ng-template pTemplate="header">
+                            <tr>
+                                <th>Project</th>
+                                <th>Role</th>
+                                <th>Status</th>
+                            </tr>
+                        </ng-template>
+                        <ng-template pTemplate="body" let-p>
+                            <tr>
+                                <td>{{ p.name }}</td>
+                                <td>{{ p.role }}</td>
+                                <td>
+                                    <p-tag [value]="p.status" [severity]="p.status === 'Active' ? 'success' : p.status === 'On Hold' ? 'warning' : 'info'"> </p-tag>
+                                </td>
+                            </tr>
+                        </ng-template>
+                    </p-table>
+                </p-card>
+            </p-tabPanel>
+
+            <p-tabPanel header="Holidays">
+                <p-card>
+                    <h3 class="mb-3">Upcoming Holidays</h3>
+                    <app-holiday-calendar-view></app-holiday-calendar-view>
+                </p-card>
+            </p-tabPanel>
+
+            <p-tabPanel header="Hirerachy">
+                <p-card>
+                    <h3 class="mb-3">Hirerachy</h3>
+                    <app-access-view></app-access-view>
+                </p-card>
+            </p-tabPanel>
+        </p-tabView>
+    </div>
+</div>

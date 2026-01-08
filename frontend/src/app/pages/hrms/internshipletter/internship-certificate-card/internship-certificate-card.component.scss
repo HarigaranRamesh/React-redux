@@ -1,0 +1,59 @@
+
+
+.cert-card {
+  max-width: 820px;
+  margin: 1rem auto;
+  border-radius: 8px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.06);
+  overflow: visible;
+  padding: 0;
+
+  &--compact {
+    max-width: 520px;
+    .certificate-body { padding: 1rem; }
+  }
+
+  .card-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid var(--surface-border);
+
+    .logo-wrap img {
+      width: 64px;
+      height: 64px;
+      object-fit: contain;
+      border-radius: 6px;
+    }
+
+    .company-details {
+      flex: 1;
+      .company-name { margin: 0; font-size: 1.1rem; }
+      .company-address { display: block; color: var(--text-600); }
+      .company-meta { font-size: 0.85rem; color: var(--text-500); }
+    }
+
+    .actions { display:flex; gap:0.5rem; }
+  }
+
+  .certificate-body {
+    padding: 1.5rem 1.25rem;
+
+    .title { text-align: center; margin: 0 0 0.75rem 0; font-weight: 600; }
+    .intro { text-align: center; margin-bottom: 1rem; }
+
+    .meta-list { list-style: none; padding: 0; display:flex; gap:1.5rem; justify-content:center; margin-bottom:1rem; li { font-size:0.95rem; } }
+
+    .responsibilities { background: transparent; padding: 0.5rem 1rem; border-radius:6px; }
+
+    .closing { margin-top: 1.25rem;
+      .signature { display:flex; justify-content:space-between; align-items:center; margin-top:1.5rem;
+        .sig-block { text-align:center; .sig-line { border-top:1px solid var(--surface-border); width:180px; margin-bottom:4px; height:1px; }
+        .sig-name { font-weight:600; }
+        .sig-designation { font-size:0.9rem; color:var(--text-500); }
+        }
+      }
+    }
+  }
+}

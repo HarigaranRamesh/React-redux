@@ -1,0 +1,132 @@
+<p-toast></p-toast>
+<p-confirmDialog></p-confirmDialog>
+
+<div class="feed-container">
+  <h2 class="title">Welcome to One Assist</h2>
+
+  <!-- Create Post -->
+  <p-card class="create-card">
+    <ng-template pTemplate="header">
+      <div class="create-header">
+        <!-- Initial Avatar -->
+        <div
+          class="avatar-circle avatar-sm"
+          [ngStyle]="{ background: getAvatarColor(currentUser.user_name) }"
+          aria-label="User Initial"
+        >
+          {{ getInitial(currentUser.user_name) }}
+        </div>
+
+        <div class="user-meta">
+          <div class="name">{{ currentUser.user_name }}</div>
+          <div class="role">
+            <span *ngIf="currentUser.position">{{ currentUser.position }}</span>
+            <span *ngIf="currentUser.userRole"> • {{ currentUser.userRole }}</span>
+          </div>
+        </div>
+      </div>
+    </ng-template>
+
+    <textarea
+      pInputTextarea
+      [(ngModel)]="newPostContent"
+      rows="3"
+      placeholder="What's on your mind?"
+      class="w-full"
+    ></textarea>
+
+    <div class="attach-row">
+      <input type="file" accept="image/*" (change)="onFileSelected($event)" />
+
+      <button
+        pButton
+        type="button"
+        label="Post"
+        icon="pi pi-send"
+        [loading]="creating"
+        (click)="createPost()"
+        [disabled]="(!newPostContent.trim() && !selectedFile)"
+      ></button>
+    </div>
+
+    <div class="preview" *ngIf="previewImage">
+      <img [src]="previewImage" class="preview-img" alt="Preview" />
+      <button
+        pButton
+        type="button"
+        class="p-button-text p-button-danger"
+        icon="pi pi-times"
+        label="Remove"
+        (click)="removeAttachment()"
+      ></button>
+    </div>
+  </p-card>
+
+  <!-- Posts -->
+  <ng-container *ngFor="let post of posts">
+    <p-card class="post-card">
+      <ng-template pTemplate="header">
+        <div class="post-header">
+          <div class="left">
+            <!-- Initial Avatar -->
+            <div
+              class="avatar-circle avatar-lg"
+              [ngStyle]="{ background: getAvatarColor(post.user_name) }"
+              aria-label="User Initial"
+            >
+              {{ getInitial(post.user_name) }}
+            </div>
+
+            <div class="user-info">
+              <div class="line1">
+                <span class="uname">{{ post.user_name }}</span>
+                <span class="time" *ngIf="post.createdAt">• {{ timeAgo(post.createdAt) }}</span>
+              </div>
+              <div class="sub">
+                <span *ngIf="post.position">{{ post.position }}</span>
+                <span *ngIf="post.userRole"> • {{ post.userRole }}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- ✅ SuperAdmin delete -->
+          <button
+            *ngIf="isSuperAdmin()"
+            pButton
+            type="button"
+            class="p-button-text p-button-danger"
+            icon="pi pi-trash"
+            label="Delete"
+            (click)="confirmDelete(post)"
+          ></button>
+        </div>
+      </ng-template>
+
+      <p class="caption" *ngIf="post.caption">{{ post.caption }}</p>
+
+      <img *ngIf="getImageSrc(post)" [src]="getImageSrc(post)!" class="post-image" alt="Post" />
+
+      <div class="footer">
+        <div class="stats">
+          <span>{{ post.likesCount || 0 }} Likes</span>
+          <span>{{ post.commentsCount || 0 }} Comments</span>
+        </div>
+
+        <div class="actions">
+          <button pButton type="button" class="p-button-text" icon="pi pi-heart" label="Like"></button>
+          <button pButton type="button" class="p-button-text" icon="pi pi-comment" label="Comment"></button>
+          <button pButton type="button" class="p-button-text" icon="pi pi-share-alt" label="Share"></button>
+        </div>
+      </div>
+    </p-card>
+  </ng-container>
+
+  <!-- Loading / End -->
+  <div class="loading" *ngIf="loading">
+    <p-progressSpinner styleClass="spinner" strokeWidth="3"></p-progressSpinner>
+  </div>
+
+  <div class="end" *ngIf="!loading && !hasMore && posts.length > 0">
+    <small>No more posts</small>
+  </div>
+</div>

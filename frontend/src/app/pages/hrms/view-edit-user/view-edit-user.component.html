@@ -1,0 +1,312 @@
+<p-toast></p-toast>
+<div class="card">
+    <p-tabs value="0">
+        <p-tablist>
+            <p-tab value="0">View/edit list</p-tab>
+            <p-tab value="1">Deleted User</p-tab>
+        </p-tablist>
+        <p-tabpanels>
+            <p-tabpanel value="0">
+                <!-- Top filter bar (optional) -->
+                <div class="p-fluid grid align-items-end gap-3 mb-3">
+                    <div class="col-12 md:col-3">
+                        <label class="mb-1 block">Filter Field</label>
+                        <p-dropdown [options]="filterOptions" [(ngModel)]="selectedField" optionLabel="label"
+                            optionValue="value"></p-dropdown>
+                    </div>
+                    <div class="col-12 md:col-4">
+                        <label class="mb-1 block">Search</label>
+                        <input pInputText [(ngModel)]="searchText" placeholder="Type to search..." />
+                    </div>
+                    <div class="col-12 md:col-2">
+                        <button pButton label="Search" icon="pi pi-search" (click)="onSearch()"></button>
+                    </div>
+                </div>
+
+                <!-- Users Table -->
+                <p-table [value]="userList" [paginator]="true" [rows]="limit" [totalRecords]="total" [lazy]="true"
+                    [loading]="loading" (onLazyLoad)="loadUsers($event)" responsiveLayout="scroll">
+                    <ng-template pTemplate="header">
+                        <tr>
+                            <th>User Name</th>
+                            <th>Mobile No</th>
+                            <th>Email</th>
+                            <th>Role</th>
+                            <th>Employee Id</th>
+                            <th style="width: 8rem">Actions</th>
+                            <th style="width: 8rem">View</th>
+                            <th style="width: 8rem">Delete</th>
+                        </tr>
+                    </ng-template>
+
+                    <ng-template pTemplate="body" let-user>
+                        <tr>
+                            <td>{{ user.user_name }}</td>
+                            <td>{{ user.mobile_no }}</td>
+                            <td>{{ user.email }}</td>
+                            <td>{{ user.role.role }}</td>
+                            <td>{{ user.empId }}</td>
+                            <td>
+                                <button pButton type="button" icon="pi pi-pencil" label="Edit"
+                                    class="p-button-sm p-button-outlined mr-2" (click)="openEditDialog(user)"></button>
+                            </td>
+                            <td><button pButton type="button" icon="pi pi-eye" label="View Docs"
+                                    class="p-button-sm p-button-info p-button-outlined mr-2"
+                                    (click)="viewUserDocs(user)"></button></td>
+
+                            <td><button pButton type="button" icon="pi pi-trash" label="Delete"
+                                    class="p-button-sm p-button-danger p-button-outlined"
+                                    (click)="confirmDelete(user)"></button></td>
+                        </tr>
+                    </ng-template>
+                </p-table>
+            </p-tabpanel>
+            <p-tabpanel value="1">
+                <app-deleted-user></app-deleted-user>
+            </p-tabpanel>
+        </p-tabpanels>
+    </p-tabs>
+</div>
+
+<!-- Edit User Dialog with Stepper -->
+<p-dialog header="Edit User" [(visible)]="showDialog" [modal]="true" [style]="{ width: '92vw' }">
+    <p-stepper [value]="activeStep" class="w-full">
+        <p-step-list>
+            <p-step [value]="1">User Information</p-step>
+            <p-step [value]="2">Documents</p-step>
+            <p-step [value]="3">Payload</p-step>
+        </p-step-list>
+
+        <p-step-panels>
+            <!-- STEP 1: User Information (Personal + Office) -->
+            <p-step-panel [value]="1">
+                <ng-template #content let-activateCallback="activateCallback">
+                    <form [formGroup]="editForm" class="p-fluid grid gap-3">
+                        <!-- Personal Info -->
+                        <div class="field col-12 md:col-4">
+                            <label>User Name</label>
+                            <input pInputText formControlName="user_name" />
+                            <small class="p-error block"
+                                *ngIf="editForm.get('user_name')?.invalid && editForm.get('user_name')?.touched">
+                                Name is required and must be letters only.
+                            </small>
+                        </div>
+                        <div class="field col-12 md:col-4">
+                            <label>Mobile No</label>
+                            <input pInputText formControlName="mobile_no" />
+                            <small class="p-error block"
+                                *ngIf="editForm.get('mobile_no')?.invalid && editForm.get('mobile_no')?.touched">
+                                Mobile No must be 10 digits.
+                            </small>
+                        </div>
+                        <div class="field col-12 md:col-4">
+                            <label>Email</label>
+                            <input pInputText formControlName="email" />
+                            <small class="p-error block"
+                                *ngIf="editForm.get('email')?.invalid && editForm.get('email')?.touched">
+                                Valid Valid email is required.
+                            </small>
+                        </div>
+
+                        <!-- Office Info -->
+                        <div class="field col-12 md:col-4">
+                            <label>Position</label>
+                            <input pInputText formControlName="position" />
+                        </div>
+                        <div class="field col-12 md:col-4">
+                            <label>Role</label>
+                            <p-dropdown [options]="roles" formControlName="role"></p-dropdown>
+                        </div>
+                        <div class="field col-12 md:col-4" *ngIf="editForm.value.role === 'Admin'">
+                            <label>Designation</label>
+                            <input pInputText formControlName="designation" />
+                        </div>
+                        <div class="field col-12 md:col-4">
+                            <label>Department</label>
+                            <input pInputText formControlName="department" />
+                        </div>
+                        <div class="field col-12 md:col-4">
+                            <label>Policy</label>
+                            <p-dropdown [options]="policies" formControlName="policyName" optionLabel="label"
+                                optionValue="value"></p-dropdown>
+                        </div>
+                        <div class="field col-12 md:col-4">
+                            <label>Date of Joining</label>
+                            <p-calendar formControlName="doj" dateFormat="dd/mm/yy"></p-calendar>
+                        </div>
+                    </form>
+                    <div class="flex justify-end mt-3 gap-2">
+                        <p-button label="Next" icon="pi pi-arrow-right" (onClick)="onNextStep1()" />
+                    </div>
+                </ng-template>
+            </p-step-panel>
+
+            <!-- STEP 2: Documents -->
+            <p-step-panel [value]="2">
+                <ng-template #content let-activateCallback="activateCallback">
+                    <!-- Default Docs -->
+                    <h5 class="mt-0 mb-2 font-semibold text-lg">Upload Documents</h5>
+                    <div class="grid">
+                        <div class="col-12 md:col-4" *ngFor="let doc of documents">
+                            <div class="flex flex-column gap-2 p-3 border-1 border-round surface-card shadow-1">
+                                <label class="font-medium">{{ doc.label }}</label>
+                                <p-fileUpload mode="basic" name="{{ doc.name }}" [accept]="doc.accept"
+                                    [chooseLabel]="doc.label" (onSelect)="pickFile(doc.name, $event)"> </p-fileUpload>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Previous Employment -->
+                    <h5 class="mt-4 mb-2 font-semibold text-lg">Previous Employment</h5>
+                    <div *ngFor="let c of prevCompanies; let i = index"
+                        class="border-1 border-round surface-card p-3 mb-3 shadow-1">
+                        <div class="p-fluid grid gap-3">
+                            <div class="col-12 md:col-4">
+                                <label>Company Name</label>
+                                <input type="text" pInputText [(ngModel)]="c.companyName" name="companyName{{ i }}" />
+                            </div>
+                            <div class="col-12 md:col-4">
+                                <label>Relieving Letter</label>
+                                <p-fileUpload mode="basic" (onSelect)="c.relieving = $event.files[0]"
+                                    chooseLabel="Upload"></p-fileUpload>
+                            </div>
+                            <div class="col-12 md:col-4">
+                                <label>Experience Letter</label>
+                                <p-fileUpload mode="basic" (onSelect)="c.experience = $event.files[0]"
+                                    chooseLabel="Upload"></p-fileUpload>
+                            </div>
+                            <div class="col-12 md:col-4">
+                                <label>Payslips</label>
+                                <p-fileUpload mode="basic" multiple (onSelect)="c.payslips = $event.files"
+                                    chooseLabel="Upload"></p-fileUpload>
+                            </div>
+                            <div class="col-12">
+                                <button pButton type="button" icon="pi pi-trash" class="p-button-text text-red-500"
+                                    *ngIf="i > 0" (click)="removeCompany(i)">Remove</button>
+                            </div>
+                        </div>
+                    </div>
+                    <button pButton type="button" label="Add Company" icon="pi pi-plus" (click)="addCompany()"></button>
+
+                    <!-- PG Certificates -->
+                    <h5 class="mt-4 mb-2 font-semibold text-lg">Postgraduate Certificates</h5>
+                    <div *ngFor="let pg of pgCertificates; let i = index"
+                        class="border-1 border-round surface-card p-3 mb-3 shadow-1">
+                        <div class="p-fluid grid gap-3">
+                            <div class="col-12 md:col-6">
+                                <label>PG Certificate</label>
+                                <p-fileUpload mode="basic" (onSelect)="pg.certificate = $event.files[0]"
+                                    chooseLabel="Upload"></p-fileUpload>
+                            </div>
+                            <div class="col-12 md:col-6">
+                                <label>PG Marksheet</label>
+                                <p-fileUpload mode="basic" (onSelect)="pg.marksheet = $event.files[0]"
+                                    chooseLabel="Upload"></p-fileUpload>
+                            </div>
+                            <div class="col-12">
+                                <button pButton type="button" icon="pi pi-trash" class="p-button-text text-red-500"
+                                    *ngIf="i > 0" (click)="removePgCertificate(i)">Remove</button>
+                            </div>
+                        </div>
+                    </div>
+                    <button pButton type="button" label="Add PG" icon="pi pi-plus"
+                        (click)="addPgCertificate()"></button>
+
+                    <!-- UG Certificates -->
+                    <h5 class="mt-4 mb-2 font-semibold text-lg">Undergraduate Certificates</h5>
+                    <div *ngFor="let ug of ugCertificates; let i = index"
+                        class="border-1 border-round surface-card p-3 mb-3 shadow-1">
+                        <div class="p-fluid grid gap-3">
+                            <div class="col-12 md:col-6">
+                                <label>UG Certificate</label>
+                                <p-fileUpload mode="basic" (onSelect)="ug.certificate = $event.files[0]"
+                                    chooseLabel="Upload"></p-fileUpload>
+                            </div>
+                            <div class="col-12 md:col-6">
+                                <label>UG Marksheet</label>
+                                <p-fileUpload mode="basic" (onSelect)="ug.marksheet = $event.files[0]"
+                                    chooseLabel="Upload"></p-fileUpload>
+                            </div>
+                            <div class="col-12">
+                                <button pButton type="button" icon="pi pi-trash" class="p-button-text text-red-500"
+                                    *ngIf="i > 0" (click)="removeUgCertificate(i)">Remove</button>
+                            </div>
+                        </div>
+                    </div>
+                    <button pButton type="button" label="Add UG" icon="pi pi-plus"
+                        (click)="addUgCertificate()"></button>
+
+                    <div class="flex justify-between mt-3">
+                        <p-button label="Back" icon="pi pi-arrow-left" (onClick)="activateCallback(1)" />
+                        <div class="flex gap-2">
+                            <p-button label="Next" icon="pi pi-arrow-right" (onClick)="onNextStep2()" />
+                        </div>
+                    </div>
+                </ng-template>
+            </p-step-panel>
+
+            <!-- STEP 3: Payload -->
+            <p-step-panel [value]="3">
+                <ng-template #content let-activateCallback="activateCallback">
+                    <app-payload [empId]="selectedUser?._id" [payloadData]="selectedPayload"
+                        [isEditMode]="!!selectedPayload"> </app-payload>
+
+                    <div class="flex justify-between mt-3">
+                        <p-button label="Back" icon="pi pi-arrow-left" (onClick)="activateCallback(2)" />
+                        <!-- <p-button label="Save User Info" icon="pi pi-check" (onClick)="saveEditedUser()"
+                            [disabled]="editForm.invalid" /> -->
+                    </div>
+                </ng-template>
+            </p-step-panel>
+        </p-step-panels>
+    </p-stepper>
+</p-dialog>
+
+<p-dialog header="User Documents" [(visible)]="showDocsDialog" [modal]="true" [style]="{ width: '80vw' }"
+    [draggable]="false" [resizable]="false">
+    <ng-container *ngIf="userDocs; else noDocs">
+        <div class="grid">
+            <div class="col-12 md:col-4" *ngIf="userDocs.photo">
+                <h5>Photo</h5>
+                <img [src]="environment.apiUrl + userDocs.photo" alt="User Photo"
+                    class="w-full border-round shadow-1" />
+            </div>
+
+            <div class="col-12 md:col-4" *ngIf="userDocs.aadhar_front">
+                <h5>Aadhar Front</h5>
+                <img [src]="environment.apiUrl + userDocs.aadhar_front" alt="Aadhar Front"
+                    class="w-full border-round shadow-1" />
+            </div>
+
+            <div class="col-12 md:col-4" *ngIf="userDocs.aadhar_back">
+                <h5>Aadhar Back</h5>
+                <img [src]="environment.apiUrl + userDocs.aadhar_back" alt="Aadhar Back"
+                    class="w-full border-round shadow-1" />
+            </div>
+
+            <div class="col-12 md:col-4" *ngIf="userDocs.pan_front">
+                <h5>PAN Front</h5>
+                <img [src]="environment.apiUrl + userDocs.pan_front" alt="PAN Front"
+                    class="w-full border-round shadow-1" />
+            </div>
+
+            <div class="col-12 md:col-4" *ngIf="userDocs.pan_back">
+                <h5>PAN Back</h5>
+                <img [src]="environment.apiUrl + userDocs.pan_back" alt="PAN Back"
+                    class="w-full border-round shadow-1" />
+            </div>
+
+            <div class="col-12" *ngIf="!userDocs.photo && !userDocs.aadhar_front && !userDocs.pan_front">
+                <p>No document images available for this user.</p>
+            </div>
+        </div>
+    </ng-container>
+
+    <ng-template #noDocs>
+        <p>No documents found for this user.</p>
+    </ng-template>
+
+    <ng-template pTemplate="footer">
+        <p-button label="Close" icon="pi pi-times" (onClick)="showDocsDialog = false"></p-button>
+    </ng-template>
+</p-dialog>

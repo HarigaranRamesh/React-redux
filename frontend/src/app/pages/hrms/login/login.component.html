@@ -1,0 +1,59 @@
+<p-toast></p-toast>
+
+<div class="flex justify-center items-center min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 px-4">
+    <form
+        #loginForm="ngForm"
+        (ngSubmit)="login(loginForm)"
+        class="w-full max-w-sm sm:max-w-md md:max-w-lg lg:max-w-xl px-6 sm:px-8 md:px-12 lg:px-20 py-10 sm:py-12 flex flex-col items-center gap-10 sm:gap-12 backdrop-blur-2xl rounded-2xl bg-white/10 border border-white/10 shadow-lg"
+    >
+        <!-- Header -->
+        <div class="flex flex-col items-center gap-3 sm:gap-4 w-full">
+            <img src="logo.png" alt="Logo" class="h-16 sm:h-20 w-auto object-contain" />
+            <div class="text-center text-2xl sm:text-3xl font-medium text-white leading-tight">Welcome Back</div>
+        </div>
+
+        <!-- Form Fields -->
+        <div class="flex flex-col items-center gap-6 sm:gap-8 w-full">
+            <div class="flex flex-col gap-5 sm:gap-6 w-full">
+                <!-- Username -->
+                <div class="relative w-full">
+                    <i class="pi pi-user text-white/70 absolute left-4 top-1/2 -translate-y-1/2"></i>
+                    <input
+                        name="UserId"
+                        [(ngModel)]="loginService.username"
+                        required
+                        type="text"
+                        placeholder="Username"
+                        class="appearance-none border border-white/10 w-full outline-0 bg-white/10 text-white placeholder:text-white/70 rounded-3xl shadow-sm h-11 pl-12 pr-4"
+                    />
+                </div>
+
+                <!-- Password -->
+                <div class="relative w-full">
+                    <i class="pi pi-lock text-white/70 absolute left-4 top-1/2 -translate-y-1/2"></i>
+                    <input
+                        name="PassWord"
+                        [(ngModel)]="loginService.password"
+                        [type]="showPassword ? 'text' : 'password'"
+                        required
+                        placeholder="Password"
+                        class="appearance-none border border-white/10 w-full outline-0 bg-white/10 text-white placeholder:text-white/70 rounded-3xl shadow-sm h-11 pl-12 pr-10"
+                    />
+                    <!-- Eye Icon -->
+                    <i class="pi absolute right-4 top-1/2 -translate-y-1/2 cursor-pointer text-white/70" [ngClass]="showPassword ? 'pi-eye-slash' : 'pi-eye'" (click)="togglePassword()"></i>
+                </div>
+            </div>
+
+            <!-- Button -->
+            <button
+                pButton
+                type="submit"
+                label="Sign In"
+                class="w-full rounded-3xl text-white transition-all duration-200 py-3 sm:py-3.5"
+                [loading]="loadSpin"
+                [disabled]="loaderService.showLoader"
+                style="background-color: #1a2537; border: 1px solid #1a2537"
+            ></button>
+        </div>
+    </form>
+</div>

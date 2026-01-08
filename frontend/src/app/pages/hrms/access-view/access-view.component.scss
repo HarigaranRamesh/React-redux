@@ -1,0 +1,11 @@
+.org-scroll {
+  width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+}
+
+.org-inner {
+  width: max-content;
+  min-height: 1px;
+}

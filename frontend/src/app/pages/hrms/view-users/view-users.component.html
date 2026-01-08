@@ -1,0 +1,54 @@
+<div class="flex gap-2 items-center mb-3">
+  <p-dropdown
+    [options]="filterOptions"
+    [(ngModel)]="selectedField"
+    placeholder="Select Field"
+    optionLabel="label"
+    class="w-48"
+  ></p-dropdown>
+
+  <input
+    type="text"
+    pInputText
+    [(ngModel)]="searchText"
+    placeholder="Search..."
+    (input)="loadUsers({ first: 0, rows: limit, page: 0 })"
+    class="w-60"
+  />
+</div>
+
+<p-table
+  [value]="userList"
+  [paginator]="true"
+  [rows]="limit"
+  [totalRecords]="total"
+  [lazy]="true"
+  (onLazyLoad)="loadUsers($event)"
+  [loading]="loading"
+  [rowsPerPageOptions]="[5, 10, 20]"
+  dataKey="_id"
+>
+  <ng-template pTemplate="header">
+    <tr>
+      <th>User Name</th>
+      <th>Mobile No</th>
+      <th>Email</th>
+      <th>Role</th>
+      <th>Status</th>
+      <!-- <th>Balance</th> -->
+      <th>Date of Joining</th>
+    </tr>
+  </ng-template>
+
+  <ng-template pTemplate="body" let-user>
+    <tr>
+      <td>{{ user.user_name }}</td>
+      <td>{{ user.mobile_no }}</td>
+      <td>{{ user.email }}</td>
+      <td>{{ user.role.role }}</td>
+      <td>{{ user.status ? 'Active' : 'Inactive' }}</td>
+      <!-- <td>{{ user.balance?.amount ?? 0 }}</td> -->
+      <td>{{ user.doj | date: 'mediumDate' }}</td>
+    </tr>
+  </ng-template>
+</p-table>

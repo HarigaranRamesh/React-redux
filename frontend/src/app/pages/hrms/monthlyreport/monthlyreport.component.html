@@ -1,0 +1,41 @@
+<div class="card">
+  <div class="flex gap-3 mb-3">
+    <p-dropdown
+      [options]="monthOptions"
+      [(ngModel)]="month"
+      placeholder="Select Month"
+      (onChange)="onMonthChange()">
+    </p-dropdown>
+
+    <input
+      type="number"
+      [(ngModel)]="year"
+      (change)="onMonthChange()"
+      style="width:100px" />
+
+    <button pButton type="button" label="Export CSV" icon="pi pi-file"
+            class="p-button-sm p-button-secondary" (click)="exportCSV()"></button>
+    <button pButton type="button" label="Export Excel" icon="pi pi-file-excel"
+            class="p-button-sm p-button-success" (click)="exportExcel()"></button>
+  </div>
+
+  <h3>Monthly Attendance Report ({{ year }} - {{ month }})</h3>
+
+  <p-table [value]="attendanceData" [tableStyle]="{ 'min-width': '100%' }" [scrollable]="true" scrollHeight="400px">
+    <ng-template pTemplate="header">
+      <tr>
+        <th *ngFor="let col of cols">
+          {{ col === '_totals' ? 'Total' : col === 'user_name' ? 'User Name' : col }}
+        </th>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="body" let-row>
+      <tr>
+        <td *ngFor="let col of cols" [ngClass]="getCellClass(row[col])">
+          {{ row[col] || '-' }}
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>

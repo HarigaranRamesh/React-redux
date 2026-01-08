@@ -1,0 +1,96 @@
+<p-toast></p-toast>
+<p-confirmDialog></p-confirmDialog>
+
+<!-- <div class="card">
+  <h2 class="mb-3">Deleted Users</h2>
+
+  <p-table
+    [value]="deletedUsers"
+    [paginator]="true"
+    [rows]="10"
+    [loading]="loading"
+    [responsiveLayout]="'scroll'"
+  >
+    <ng-template pTemplate="header">
+      <tr>
+        <th>Name</th>
+        <th>Email</th>
+        <th>Mobile</th>
+        <th>Designation</th>
+        <th>Department</th>
+        <th>Reason</th>
+        <th>Deleted At</th>
+        <th>Action</th>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="body" let-user>
+      <tr>
+        <td>{{ user.user_name }}</td>
+        <td>{{ user.email }}</td>
+        <td>{{ user.mobile_no }}</td>
+        <td>{{ user.designation }}</td>
+        <td>{{ user.department }}</td>
+        <td>{{ user.deletedReason }}</td>
+        <td>{{ user.deletedAt | date:'medium' }}</td>
+        <td>
+          <button
+            pButton
+            label="Restore"
+            icon="pi pi-refresh"
+            class="p-button-sm p-button-success"
+            (click)="confirmRestore(user)"
+          ></button>
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>
+<p-toast></p-toast>
+<p-confirmDialog></p-confirmDialog> -->
+
+<div class="card">
+  <h2 class="mb-3">Deleted Users</h2>
+
+  <p-table
+    [value]="deletedUsers"
+    [paginator]="true"
+    [rows]="10"
+    [loading]="loading"
+    [responsiveLayout]="'scroll'"
+  >
+    <ng-template pTemplate="header">
+      <tr>
+        <th>Name</th>
+        <th>Email</th>
+        <th>Mobile</th>
+        <th>Designation</th>
+        <th>Department</th>
+        <th>Reason</th>
+        <th>Deleted At</th>
+        <th>Action</th>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="body" let-user>
+      <tr>
+        <td>{{ user.user_name }}</td>
+        <td>{{ user.email }}</td>
+        <td>{{ user.mobile_no }}</td>
+        <td>{{ user.designation }}</td>
+        <td>{{ user.department }}</td>
+        <td>{{ user.deletedReason }}</td>
+        <td>{{ user.deletedAt | date:'medium' }}</td>
+        <td>
+          <button
+            pButton
+            label="Restore"
+            icon="pi pi-refresh"
+            class="p-button-sm p-button-success"
+            (click)="confirmRestore(user)"
+          ></button>
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>

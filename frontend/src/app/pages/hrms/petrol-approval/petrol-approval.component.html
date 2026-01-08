@@ -1,0 +1,154 @@
+<p-tabView>
+  <!-- 🔹 Bulk + Single (inline) -->
+  <p-tabPanel header="Petrol Approvals">
+    <p-toolbar class="mb-4">
+      <ng-template #end>
+        <input
+          pInputText
+          type="text"
+          [(ngModel)]="bulkSearchText"
+          (input)="onSearchBulk(dtBulk)"
+          placeholder="Search employees..."
+          class="p-2"
+        />
+      </ng-template>
+    </p-toolbar>
+
+    <p-table
+      #dtBulk
+      [value]="bulkClaims"
+      [rows]="bulkLimit"
+      [paginator]="true"
+      [totalRecords]="bulkTotal"
+      [lazy]="true"
+      [loading]="bulkLoading"
+      [rowsPerPageOptions]="[5,10,20]"
+      (onPage)="getBulkPetrolCredits($event)"
+      dataKey="userId"
+      [rowHover]="true"
+      [first]="(bulkPage - 1) * bulkLimit"
+      currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+      [showCurrentPageReport]="true"
+    >
+      <ng-template pTemplate="header">
+        <tr>
+          <th>Employee</th>
+          <th>Email</th>
+          <th>Mobile</th>
+          <th>Pending Claims</th>
+          <th style="width: 260px;">Actions</th>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="body" let-user>
+        <tr>
+          <td>{{ user.user_name }}</td>
+          <td>{{ user.email }}</td>
+          <td>{{ user.mobile_no }}</td>
+          <td>{{ user.claims.length }}</td>
+          <td>
+            <p-button
+              label="{{ user.expanded ? 'Hide Claims' : 'View Claims' }}"
+              icon="pi pi-eye"
+              styleClass="p-button-info p-button-sm mr-2"
+              (onClick)="toggleExpand(user)"
+            ></p-button>
+
+            <p-button
+              label="Approve All"
+              icon="pi pi-check"
+              styleClass="p-button-success p-button-sm"
+              (onClick)="approveAllClaims(user)"
+              [disabled]="!user.claims?.length"
+            ></p-button>
+          </td>
+        </tr>
+
+        <!-- 🔻 Inline Single Approval Table -->
+        <tr *ngIf="user.expanded">
+          <td colspan="5">
+            <p-table [value]="user.claims">
+              <ng-template pTemplate="header">
+                <tr>
+                  <th>From</th>
+                  <th>To</th>
+                  <th>Purpose</th>
+                  <th>Kms</th>
+                  <th>Amount</th>
+                  <th>Mode</th>
+                  <th>Date</th>
+                  <th>Status</th>
+                  <th style="width: 180px;">Actions</th>
+                </tr>
+              </ng-template>
+
+              <ng-template pTemplate="body" let-claim>
+                <tr>
+                  <td>{{ claim.from }}</td>
+                  <td>{{ claim.to }}</td>
+                  <td>{{ claim.purposeofVisit }}</td>
+                  <td>{{ claim.kms }}</td>
+                  <td>{{ claim.amount }}</td>
+                  <td>{{ claim.modeoftransport }}</td>
+                  <td>{{ claim.updatedAt | date:'dd/MM/yyyy' }}</td>
+                  <td>
+                    <span *ngIf="claim.approved === null" class="text-warning">Pending</span>
+                    <span *ngIf="claim.approved === true" class="text-success">Approved</span>
+                    <span *ngIf="claim.approved === false" class="text-danger">Rejected</span>
+                  </td>
+                  <td>
+                    <p-button
+                      label="Approve"
+                      icon="pi pi-check"
+                      styleClass="p-button-success p-button-sm mr-2"
+                      *ngIf="claim.approved === null"
+                      (onClick)="openRemarksDialog(claim._id, 'approve')"
+                    ></p-button>
+
+                    <p-button
+                      label="Reject"
+                      icon="pi pi-times"
+                      styleClass="p-button-danger p-button-sm"
+                      *ngIf="claim.approved === null"
+                      (onClick)="openRemarksDialog(claim._id, 'reject')"
+                    ></p-button>
+                  </td>
+                </tr>
+              </ng-template>
+            </p-table>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </p-tabPanel>
+</p-tabView>
+
+<!-- ✅ Remarks Dialog -->
+<p-dialog
+  header="Add Remarks"
+  [(visible)]="displayRemarksDialog"
+  [modal]="true"
+  [style]="{ width: '30vw' }"
+>
+  <div class="field">
+    <label for="remarks">Remarks</label>
+    <textarea
+      id="remarks"
+      rows="3"
+      class="p-inputtext p-component w-full"
+      [(ngModel)]="remarks"
+    ></textarea>
+  </div>
+
+  <ng-template pTemplate="footer">
+    <p-button label="Submit" icon="pi pi-check" (onClick)="submitAction()"></p-button>
+    <p-button
+      label="Cancel"
+      icon="pi pi-times"
+      class="p-button-secondary"
+      (onClick)="displayRemarksDialog = false"
+    ></p-button>
+  </ng-template>
+</p-dialog>
+
+<p-toast></p-toast>

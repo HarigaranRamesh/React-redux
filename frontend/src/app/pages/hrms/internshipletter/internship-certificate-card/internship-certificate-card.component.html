@@ -1,0 +1,65 @@
+<p-card class="cert-card" [ngClass]="{'cert-card--compact': compact}">
+  <ng-template pTemplate="header">
+    <div class="card-header">
+      <div class="logo-wrap" *ngIf="certificate.companyLogoUrl">
+        <img [src]="certificate.companyLogoUrl" alt="{{certificate.companyName}} logo" />
+      </div>
+
+      <div class="company-details">
+        <h3 class="company-name">{{certificate.companyName}}</h3>
+        <small class="company-address">{{certificate.companyAddress}}</small>
+        <div class="company-meta">
+          <span *ngIf="certificate.companyPhone">{{certificate.companyPhone}}</span>
+          <span *ngIf="certificate.companyWebsite"> | {{certificate.companyWebsite}}</span>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button pButton type="button" icon="pi pi-download" label="Download" (click)="onDownload()"></button>
+      </div>
+    </div>
+  </ng-template>
+
+  <div class="certificate-body">
+    <h2 class="title">Certificate of Internship</h2>
+
+    <p class="intro">
+      This is to certify that <strong>{{certificate.internName}}</strong>
+      <span *ngIf="certificate.internId">(ID: {{certificate.internId}})</span>
+      has successfully completed an internship with <strong>{{certificate.companyName}}</strong>.
+    </p>
+
+    <ul class="meta-list">
+      <li *ngIf="certificate.department"><strong>Department:</strong> {{certificate.department}}</li>
+      <li *ngIf="certificate.role"><strong>Role:</strong> {{certificate.role}}</li>
+      <li *ngIf="certificate.startDate && certificate.endDate"><strong>Duration:</strong> {{certificate.startDate}} — {{certificate.endDate}}</li>
+      <li *ngIf="certificate.totalDuration"><strong>Total:</strong> {{certificate.totalDuration}}</li>
+    </ul>
+
+    <div class="responsibilities" *ngIf="certificate.responsibilities?.length">
+      <h4>Key Responsibilities</h4>
+      <ol>
+        <li *ngFor="let r of certificate.responsibilities">{{r}}</li>
+      </ol>
+    </div>
+
+    <div class="closing">
+      <p>
+        We appreciate <strong>{{certificate.internName}}</strong>'s contribution and wish them success in their future endeavours.
+      </p>
+
+      <div class="signature">
+        <div class="sig-left">
+          <small>Issued on: {{certificate.issueDate || certificate.endDate}}</small>
+        </div>
+        <div class="sig-right">
+          <div class="sig-block">
+            <div class="sig-line">&nbsp;</div>
+            <div class="sig-name">{{certificate.authorizedName}}</div>
+            <div class="sig-designation">{{certificate.authorizedDesignation}}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</p-card>

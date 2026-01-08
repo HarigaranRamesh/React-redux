@@ -1,0 +1,372 @@
+<p-toast></p-toast>
+
+<div class="card flex justify-center">
+  <p-stepper [value]="activeStep" class="basis-[70rem]">
+    <!-- STEP HEADERS -->
+    <p-step-list>
+      <p-step [value]="1">User Info</p-step>
+      <p-step [value]="2">Documents</p-step>
+      <p-step [value]="3">Payload</p-step>
+    </p-step-list>
+
+    <p-step-panels>
+      <!-- STEP 1: USER FORM -->
+      <p-step-panel [value]="1">
+        <ng-template #content let-activateCallback="activateCallback">
+          <h3 class="text-xl font-semibold mb-3">User Information</h3>
+          <form [formGroup]="userForm" class="p-fluid formgrid grid">
+            <!-- === ALL YOUR USER FORM FIELDS HERE === -->
+
+            <!-- Username -->
+            <div class="field col-12 md:col-4 mb-4">
+              <p-floatLabel variant="on">
+                <input id="user_name" type="text" pInputText formControlName="user_name" />
+                <label for="user_name">User Name</label>
+              </p-floatLabel>
+              <small *ngIf="userForm.get('user_name')?.hasError('required') && userForm.get('user_name')?.touched"
+                class="p-error">Username is required</small>
+              <small *ngIf="userForm.get('user_name')?.hasError('pattern') && userForm.get('user_name')?.touched"
+                class="p-error">Only alphabets are allowed</small>
+            </div>
+
+            <!-- Mobile No -->
+            <div class="field col-12 md:col-4 mb-4">
+              <p-floatLabel variant="on">
+                <input id="mobile_no" type="text" pInputText formControlName="mobile_no" />
+                <label for="mobile_no">Mobile No</label>
+              </p-floatLabel>
+              <small *ngIf="userForm.get('mobile_no')?.hasError('required') && userForm.get('mobile_no')?.touched"
+                class="p-error">Mobile number is required</small>
+              <small *ngIf="userForm.get('mobile_no')?.hasError('pattern') && userForm.get('mobile_no')?.touched"
+                class="p-error">Enter a valid 10-digit number</small>
+            </div>
+
+            <!-- Email -->
+            <div class="field col-12 md:col-4 mb-4">
+              <p-floatLabel variant="on">
+                <input id="email" type="email" pInputText formControlName="email" />
+                <label for="email">Email</label>
+              </p-floatLabel>
+              <small *ngIf="userForm.get('email')?.hasError('required') && userForm.get('email')?.touched"
+                class="p-error">Email is required</small>
+              <small *ngIf="userForm.get('email')?.hasError('email') && userForm.get('email')?.touched"
+                class="p-error">Enter a valid email</small>
+            </div>
+
+            <!-- Password -->
+            <div class="field col-12 md:col-4 mb-4">
+              <p-floatLabel variant="on">
+                <input id="password" type="password" pInputText formControlName="password" />
+                <label for="password">Password</label>
+              </p-floatLabel>
+              <small *ngIf="userForm.get('password')?.hasError('required') && userForm.get('password')?.touched"
+                class="p-error">Password is required</small>
+            </div>
+
+            <!-- Position -->
+            <div class="field col-12 md:col-4 mb-4">
+              <p-floatLabel variant="on">
+                <input id="position" type="text" pInputText formControlName="position" />
+                <label for="position">Position</label>
+              </p-floatLabel>
+              <small *ngIf="userForm.get('position')?.hasError('required') && userForm.get('position')?.touched"
+                class="p-error">Position is required</small>
+              <small *ngIf="userForm.get('position')?.hasError('pattern') && userForm.get('position')?.touched"
+                class="p-error">Only alphabets are allowed</small>
+            </div>
+
+            <!-- Role Dropdown -->
+            <div class="field col-12 md:col-4 mb-4">
+              <!-- <p-floatLabel variant="on"> -->
+              <label for="role">Role</label>
+              <p-dropdown inputId="role" [options]="roles" optionLabel="role" optionValue="_id" formControlName="role">
+              </p-dropdown>
+              <!-- </p-floatLabel> -->
+              <small *ngIf="userForm.get('role')?.hasError('required') && userForm.get('role')?.touched"
+                class="p-error">Role is required</small>
+            </div>
+
+            <!-- Designation (only when role === 'Admin') -->
+            <div class="field col-12 md:col-4 mb-4"
+              *ngIf="userForm.value.role === 'Admin' || selectedRoleName === 'Admin'">
+              <p-floatLabel variant="on">
+                <input id="designation" type="text" pInputText formControlName="designation" />
+                <label for="designation">Designation (for Admin)</label>
+              </p-floatLabel>
+              <small *ngIf="userForm.get('designation')?.hasError('required') && userForm.get('designation')?.touched"
+                class="p-error">Designation is required for Admin</small>
+              <small *ngIf="userForm.get('designation')?.hasError('pattern') && userForm.get('designation')?.touched"
+                class="p-error">Only alphabets are allowed</small>
+            </div>
+
+            <!-- Department -->
+            <div class="field col-12 md:col-4 mb-4">
+              <p-floatLabel variant="on">
+                <input id="department" type="text" pInputText formControlName="department" />
+                <label for="department">Department</label>
+              </p-floatLabel>
+              <small *ngIf="userForm.get('department')?.hasError('pattern') && userForm.get('department')?.touched"
+                class="p-error">Only alphabets are allowed</small>
+            </div>
+
+            <!-- Policy Name (AFTER Department) -->
+            <div class="field col-12 md:col-4 mb-4">
+              <!-- <p-floatLabel variant="on"> -->
+              <label for="policyName">Policy Name: </label>
+              <p-dropdown inputId="policyName" [options]="leavePolicies" formControlName="policyName"
+                optionLabel="label" optionValue="value" [showClear]="true" placeholder="Select policy">
+              </p-dropdown>
+
+              <!-- </p-floatLabel> -->
+              <small *ngIf="userForm.get('policyName')?.hasError('required') && userForm.get('policyName')?.touched"
+                class="p-error">
+                Policy is required
+              </small>
+            </div>
+
+            <!-- DOJ -->
+            <div class="field col-12 md:col-4 mb-4">
+              <p-floatLabel variant="on">
+                <p-calendar id="doj" formControlName="doj" dateFormat="dd/mm/yy" [showIcon]="true"></p-calendar>
+                <label for="doj">Date of Joining</label>
+              </p-floatLabel>
+              <small *ngIf="userForm.get('doj')?.hasError('required') && userForm.get('doj')?.touched"
+                class="p-error">Date of joining is required</small>
+            </div>
+            <!-- Submit -->
+
+            <div class="field col-12 mt-4 flex justify-end">
+              <p-button label="Create User" [disabled]="userForm.invalid" [loading]="isSubmittingUser"
+                (onClick)="onSubmitUser(activateCallback)">
+              </p-button>
+            </div>
+          </form>
+        </ng-template>
+      </p-step-panel>
+
+      <!-- STEP 2: DOCUMENT UPLOADS -->
+      <p-step-panel [value]="2">
+        <ng-template #content let-activateCallback="activateCallback">
+          <h3 class="text-xl font-semibold mb-3">Upload Documents</h3>
+          <form class="p-fluid formgrid grid">
+            <!-- === YOUR DOCUMENT UPLOAD FIELDS === -->
+
+            <!-- Photo -->
+            <div class="field col-12 md:col-4">
+              <label>Profile Photo</label>
+              <p-fileUpload mode="basic" accept="image/*" chooseLabel="Upload"
+                (onSelect)="pickFile('photo', $event)"></p-fileUpload>
+            </div>
+
+            <!-- Aadhar Front -->
+            <div class="field col-12 md:col-4">
+              <label>Aadhar Front</label>
+              <p-fileUpload mode="basic" accept="image/*" chooseLabel="Upload"
+                (onSelect)="pickFile('aadhar_front', $event)"></p-fileUpload>
+            </div>
+
+            <!-- Aadhar Back -->
+            <div class="field col-12 md:col-4">
+              <label>Aadhar Back</label>
+              <p-fileUpload mode="basic" accept="image/*" chooseLabel="Upload"
+                (onSelect)="pickFile('aadhar_back', $event)"></p-fileUpload>
+            </div>
+
+            <!-- PAN Front -->
+            <div class="field col-12 md:col-4">
+              <label>PAN Front</label>
+              <p-fileUpload mode="basic" accept="image/*" chooseLabel="Upload"
+                (onSelect)="pickFile('pan_front', $event)"></p-fileUpload>
+            </div>
+
+            <!-- PAN Back -->
+            <div class="field col-12 md:col-4">
+              <label>PAN Back</label>
+              <p-fileUpload mode="basic" accept="image/*" chooseLabel="Upload"
+                (onSelect)="pickFile('pan_back', $event)"></p-fileUpload>
+            </div>
+
+            <div *ngFor="let c of prevCompanies; let i = index"
+              class="col-12 border rounded-xl p-5 mb-4 shadow-sm bg-white">
+              <div class="p-fluid grid gap-4">
+                <div class="col-12 md:col-4">
+                  <div class="flex flex-col gap-2">
+                    <label class="text-sm font-medium text-gray-700">Company Name</label>
+                    <input type="text" pInputText [(ngModel)]="c.companyName" placeholder="Enter company name"
+                      name="companyName{{ i }}"
+                      class="p-inputtext w-full border rounded-lg px-3 py-2 bg-gray-50 focus:border-blue-400 focus:ring-2 focus:ring-blue-300" />
+                  </div>
+                </div>
+
+                <div class="col-12 md:col-4">
+                  <div class="flex flex-col gap-2">
+                    <label class="text-sm font-medium text-gray-700">Relieving Letter</label>
+                    <p-fileUpload mode="basic" (onSelect)="c.relieving = $event.files[0]" chooseLabel="Upload"
+                      class="w-full border rounded-lg"></p-fileUpload>
+                  </div>
+                </div>
+
+                <div class="col-12 md:col-4">
+                  <div class="flex flex-col gap-2">
+                    <label class="text-sm font-medium text-gray-700">Experience Letter</label>
+                    <p-fileUpload mode="basic" (onSelect)="c.experience = $event.files[0]" chooseLabel="Upload"
+                      class="w-full border rounded-lg"></p-fileUpload>
+                  </div>
+                </div>
+
+                <div class="col-12 md:col-4">
+                  <div class="flex flex-col gap-2">
+                    <label class="text-sm font-medium text-gray-700">Payslips</label>
+                    <p-fileUpload mode="basic" multiple (onSelect)="c.payslips = $event.files" chooseLabel="Upload"
+                      class="w-full border rounded-lg"></p-fileUpload>
+                  </div>
+                </div>
+
+                <div class="col-12">
+                  <button pButton type="button" icon="pi pi-trash"
+                    class="p-button-text text-red-500 hover:text-red-700 mt-2" *ngIf="i > 0"
+                    (click)="removeCompany(i)">Remove</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-12">
+              <button pButton type="button" label="Add Company" icon="pi pi-plus" class="mt-3"
+                (click)="addCompany()"></button>
+            </div>
+
+            <!-- PG Certificates -->
+            <h5 class="col-12 mt-6 font-semibold text-lg">Postgraduate Certificates</h5>
+            <div *ngFor="let pg of pgCertificates; let i = index"
+              class="col-12 border rounded-xl p-5 mb-4 shadow-sm bg-white">
+              <div class="p-fluid grid gap-4">
+                <div class="col-12 md:col-6">
+                  <div class="flex flex-col gap-2">
+                    <label class="text-sm font-medium text-gray-700">PG Certificate</label>
+                    <p-fileUpload mode="basic" (onSelect)="pg.certificate = $event.files[0]" chooseLabel="Upload"
+                      class="w-full border rounded-lg"></p-fileUpload>
+                  </div>
+                </div>
+
+                <div class="col-12 md:col-6">
+                  <div class="flex flex-col gap-2">
+                    <label class="text-sm font-medium text-gray-700">PG Marksheet</label>
+                    <p-fileUpload mode="basic" (onSelect)="pg.marksheet = $event.files[0]" chooseLabel="Upload"
+                      class="w-full border rounded-lg"></p-fileUpload>
+                  </div>
+                </div>
+
+                <div class="col-12">
+                  <button pButton type="button" icon="pi pi-trash"
+                    class="p-button-text text-red-500 hover:text-red-700 mt-2" *ngIf="i > 0"
+                    (click)="removePgCertificate(i)">Remove</button>
+                </div>
+              </div>
+            </div>
+            <div class="col-12">
+              <button pButton type="button" label="Add PG" icon="pi pi-plus" class="mt-3"
+                (click)="addPgCertificate()"></button>
+            </div>
+
+            <!-- UG Certificates -->
+            <h5 class="col-12 mt-6 font-semibold text-lg">Undergraduate Certificates</h5>
+            <div *ngFor="let ug of ugCertificates; let i = index"
+              class="col-12 border rounded-xl p-5 mb-4 shadow-sm bg-white">
+              <div class="p-fluid grid gap-4">
+                <div class="col-12 md:col-6">
+                  <div class="flex flex-col gap-2">
+                    <label class="text-sm font-medium text-gray-700">UG Certificate</label>
+                    <p-fileUpload mode="basic" (onSelect)="ug.certificate = $event.files[0]" chooseLabel="Upload"
+                      class="w-full border rounded-lg"></p-fileUpload>
+                  </div>
+                </div>
+
+                <div class="col-12 md:col-6">
+                  <div class="flex flex-col gap-2">
+                    <label class="text-sm font-medium text-gray-700">UG Marksheet</label>
+                    <p-fileUpload mode="basic" (onSelect)="ug.marksheet = $event.files[0]" chooseLabel="Upload"
+                      class="w-full border rounded-lg"></p-fileUpload>
+                  </div>
+                </div>
+
+                <div class="col-12">
+                  <button pButton type="button" icon="pi pi-trash"
+                    class="p-button-text text-red-500 hover:text-red-700 mt-2" *ngIf="i > 0"
+                    (click)="removeUgCertificate(i)">Remove</button>
+                </div>
+              </div>
+            </div>
+            <div class="col-12">
+              <button pButton type="button" label="Add UG" icon="pi pi-plus" class="mt-3"
+                (click)="addUgCertificate()"></button>
+            </div>
+            <!-- Others Certificates -->
+            <h5 class="col-12 mt-6 font-semibold text-lg">Other Certificates</h5>
+            <div *ngFor="let o of others; let i = index" class="col-12 border rounded-xl p-5 mb-4 shadow-sm bg-white">
+              <div class="p-fluid grid gap-4">
+                <!-- Certificate Name -->
+                <div class="col-12 md:col-4">
+                  <div class="flex flex-col gap-2">
+                    <label class="text-sm font-medium text-gray-700">Certificate Name</label>
+                    <input type="text" pInputText [(ngModel)]="o.certificatename" placeholder="Enter certificate name"
+                      name="certificatename{{ i }}"
+                      class="p-inputtext w-full border rounded-lg px-3 py-2 bg-gray-50 focus:border-blue-400 focus:ring-2 focus:ring-blue-300" />
+                  </div>
+                </div>
+
+                <!-- Certificate File -->
+                <div class="col-12 md:col-4">
+                  <div class="flex flex-col gap-2">
+                    <label class="text-sm font-medium text-gray-700">Certificate</label>
+                    <p-fileUpload mode="basic" (onSelect)="o.certificate = $event.files[0]" chooseLabel="Upload"
+                      class="w-full border rounded-lg"></p-fileUpload>
+                  </div>
+                </div>
+
+                <!-- Marksheet File -->
+                <div class="col-12 md:col-4">
+                  <div class="flex flex-col gap-2">
+                    <label class="text-sm font-medium text-gray-700">Marksheet</label>
+                    <p-fileUpload mode="basic" (onSelect)="o.marksheet = $event.files[0]" chooseLabel="Upload"
+                      class="w-full border rounded-lg"></p-fileUpload>
+                  </div>
+                </div>
+
+                <div class="col-12">
+                  <button pButton type="button" icon="pi pi-trash"
+                    class="p-button-text text-red-500 hover:text-red-700 mt-2" *ngIf="i > 0" (click)="removeOther(i)">
+                    Remove
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-12">
+              <button pButton type="button" label="Add Other" icon="pi pi-plus" class="mt-3"
+                (click)="addOther()"></button>
+            </div>
+
+
+            <div class="field col-12 mt-4 flex justify-between">
+              <p-button label="Back" severity="secondary" icon="pi pi-arrow-left"
+                (onClick)="activateCallback(1)"></p-button>
+              <p-button label="Upload Documents" [loading]="isSubmittingUploads"
+                (onClick)="onSubmitUploads(activateCallback)">
+              </p-button>
+            </div>
+          </form>
+        </ng-template>
+      </p-step-panel>
+
+      <!-- STEP 3: PAYLOAD -->
+      <p-step-panel [value]="3">
+        <ng-template #content let-activateCallback="activateCallback">
+          <app-payload [empId]="empId"></app-payload>
+          <div class="flex justify-start mt-4">
+            <p-button label="Back" icon="pi pi-arrow-left" (onClick)="activateCallback(2)"></p-button>
+          </div>
+        </ng-template>
+      </p-step-panel>
+    </p-step-panels>
+  </p-stepper>
+</div>

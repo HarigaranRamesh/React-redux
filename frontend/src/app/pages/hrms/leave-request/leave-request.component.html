@@ -1,0 +1,64 @@
+<p-toast></p-toast>
+
+<form [formGroup]="leaveForm" (ngSubmit)="submitLeaveRequest()" class="p-fluid formgrid grid">
+  <!-- Leave Type -->
+  <div class="field col-12 md:col-6">
+    <label for="leaveType">Leave Type</label>
+    <p-dropdown
+      id="leaveType"
+      [options]="leaveTypes"
+      formControlName="leaveType"
+      placeholder="Select Leave Type">
+    </p-dropdown>
+  </div>
+
+  <!-- Start Date -->
+  <div class="field col-12 md:col-6">
+    <label for="startDate">Start Date</label>
+    <p-calendar
+      id="startDate"
+      formControlName="startDate"
+      [showIcon]="true"
+      [readonlyInput]="true"
+      appendTo="body"
+      dateFormat="dd/mm/yy"
+      [disabledDates]="disabledDatesStart"
+      (onMonthChange)="onStartMonthChange($event)"
+      (onSelect)="onStartSelect($event)">
+    </p-calendar>
+  </div>
+
+  <!-- End Date -->
+  <div class="field col-12 md:col-6">
+    <label for="endDate">End Date</label>
+    <p-calendar
+      id="endDate"
+      formControlName="endDate"
+      [showIcon]="true"
+      [readonlyInput]="true"
+      appendTo="body"
+      dateFormat="dd/mm/yy"
+      [minDate]="leaveForm.value.startDate"
+      [disabledDates]="disabledDatesEnd"
+      (onMonthChange)="onEndMonthChange($event)"
+      (onSelect)="onEndSelect($event)">
+    </p-calendar>
+  </div>
+
+  <!-- Reason -->
+  <div class="field col-12">
+    <label for="reason">Reason</label>
+    <textarea
+      id="reason"
+      pInputTextarea
+      formControlName="reason"
+      rows="3"
+      placeholder="Enter reason for leave">
+    </textarea>
+  </div>
+
+  <!-- Submit Button -->
+  <div class="field col-12 mt-3">
+    <button pButton type="submit" label="Submit Leave Request" [disabled]="leaveForm.invalid"></button>
+  </div>
+</form>

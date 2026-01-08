@@ -1,0 +1,274 @@
+<p-toast></p-toast>
+
+<div class="planner-wrap">
+  <!-- Header -->
+  <div class="planner-header glassy">
+    <div class="lh">
+      <div class="title">Holiday Planner</div>
+      <div class="subtitle">{{ monthName(month()) }} {{ year() }}</div>
+    </div>
+
+    <div class="rh">
+      <button pButton icon="pi pi-angle-left" class="p-button-rounded p-button-text" (click)="prevMonth()" pTooltip="Previous month"></button>
+      <button pButton icon="pi pi-angle-right" class="p-button-rounded p-button-text" (click)="nextMonth()" pTooltip="Next month"></button>
+
+      <p-divider layout="vertical"></p-divider>
+
+      <!-- Creation buttons -->
+      <button *ngIf="isSuperAdmin" pButton label="Add Single" icon="pi pi-plus" class="p-button-success" (click)="openAddSingle()"></button>
+      <button *ngIf="isSuperAdmin" pButton label="Add Multiple" icon="pi pi-list-plus" class="p-button-help" (click)="openAddMultiple()"></button>
+      <button *ngIf="isSuperAdmin" pButton label="3rd & 4th Saturday" icon="pi pi-calendar-plus" class="p-button-secondary"
+              (click)="openAddRecurring({nths:[3,4], weekdays:[6]})"></button>
+
+      <p-divider layout="vertical"></p-divider>
+
+      <!-- Bulk import / templates -->
+      <button *ngIf="isSuperAdmin" pButton label="Bulk Import (CSV/XLSX)" icon="pi pi-upload" class="p-button-info" (click)="openImportBulk()"></button>
+      <button *ngIf="isSuperAdmin" pButton label="Download CSV Template" icon="pi pi-download" class="p-button-text" (click)="downloadCsvTemplate()"></button>
+      <button *ngIf="isSuperAdmin" pButton label="Download Excel Template" icon="pi pi-file-excel" class="p-button-text" (click)="downloadExcelTemplate()"></button>
+    </div>
+  </div>
+
+  <div class="planner-content">
+    <!-- CALENDAR -->
+    <div class="calendar glassy">
+      <div class="week-head">
+        <div *ngFor="let w of weekLabels" class="head-cell">{{ w }}</div>
+      </div>
+
+      <!-- Month grid -->
+      <div class="month-grid">
+        <div *ngFor="let c of grid()"
+             class="day-cell"
+             [class.out]="!c.inMonth"
+             [class.today]="c.isToday"
+             (click)="onDayClicked(c)">
+          <div class="date">{{ c.date.getDate() }}</div>
+
+          <div class="chips" *ngIf="c.holidays.length">
+            <span class="chip" *ngFor="let h of c.holidays"
+                  [style.background]="h.color || '#10b981'"
+                  [pTooltip]="h.name" tooltipPosition="top">
+              {{ h.name | slice:0:10 }}<span *ngIf="h.name.length>10">…</span>
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RULES SIDE -->
+    <div class="rules glassy">
+      <div class="rules-head">
+        <div class="rules-title">Active Holiday Rules</div>
+        <div class="rules-sub">Enable/disable or remove rules</div>
+      </div>
+
+      <p-table [value]="rules()" [paginator]="false" [tableStyle]="{'min-width':'22rem'}" responsiveLayout="scroll">
+        <ng-template pTemplate="header">
+          <tr>
+            <th>Rule</th>
+            <th>Type</th>
+            <th>On</th>
+            <th class="text-right">Actions</th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-r>
+          <tr>
+            <td>
+              <span class="color-dot" [style.background]="r.color || '#10b981'"></span>
+              {{ r.name }}
+              <p-tag *ngIf="r.isGovernment" value="Govt" severity="info" class="ml-2"></p-tag>
+            </td>
+            <td>
+              <ng-container *ngIf="r.date; else recur">
+                Single
+              </ng-container>
+              <ng-template #recur>
+                {{ r.recurrence?.kind === 'nth-weekday-monthly' ? 'Monthly (Nth Weekday)' :
+                   r.recurrence?.kind === 'weekly' ? 'Weekly' :
+                   r.recurrence?.kind === 'annual-fixed' ? 'Annual' : '—' }}
+              </ng-template>
+            </td>
+            <td>
+              <ng-container *ngIf="r.date">{{ r.date }}</ng-container>
+              <ng-container *ngIf="!r.date && r.recurrence?.kind==='nth-weekday-monthly'">
+                nth: {{ join(r.recurrence?.nths) }} | wd: {{ weekdayListText(r.recurrence?.weekdays) }}
+              </ng-container>
+              <ng-container *ngIf="!r.date && r.recurrence?.kind==='annual-fixed'">
+                {{ r.recurrence?.startDate }}
+              </ng-container>
+              <ng-container *ngIf="!r.date && r.recurrence?.kind==='weekly'">
+                {{ weekdayListText(r.recurrence?.weekdays) }}
+              </ng-container>
+            </td>
+            <td class="text-right">
+              <p-toggleButton
+                *ngIf="isSuperAdmin"
+                [onLabel]="'Enabled'" [offLabel]="'Disabled'"
+                [onIcon]="'pi pi-check'" [offIcon]="'pi pi-ban'"
+                [ngModel]="r.isEnabled"
+                (onChange)="doToggleRule(r)">
+              </p-toggleButton>
+              <button *ngIf="isSuperAdmin" pButton icon="pi pi-trash" class="p-button-text p-button-danger" (click)="doDeleteRule(r)"></button>
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+  </div>
+</div>
+
+<!-- Add Single Holiday -->
+<p-dialog header="Add Single Holiday" [(visible)]="showAddSingle" [modal]="true" [style]="{width:'420px'}">
+  <form [formGroup]="addSingleForm" (ngSubmit)="saveSingle()" class="form-v">
+    <div class="f">
+      <label>Name</label>
+      <input pInputText formControlName="name" placeholder="Holiday name">
+    </div>
+    <div class="f">
+      <label>Date</label>
+      <p-calendar appendTo="body" formControlName="date" [showIcon]="true" [touchUI]="true" dateFormat="yy-mm-dd"></p-calendar>
+    </div>
+    <div class="f">
+      <label>Color</label>
+      <div class="flex align-items-center gap-2">
+        <p-colorPicker formControlName="color" [format]="'hex'"></p-colorPicker>
+        <span class="swatch" [style.background]="displayColor(addSingleForm.get('color')?.value)"></span>
+      </div>
+    </div>
+    <div class="actions">
+      <button pButton type="button" label="Cancel" class="p-button-text" (click)="showAddSingle=false"></button>
+      <button pButton type="submit" label="Save" icon="pi pi-check" [disabled]="addSingleForm.invalid || saving"></button>
+    </div>
+  </form>
+</p-dialog>
+
+<!-- Add Recurring Rule -->
+<p-dialog header="Add Recurring Monthly (Nth Weekday)" [(visible)]="showAddRecurring" [modal]="true" [style]="{width:'520px'}">
+  <form [formGroup]="addRecurringForm" (ngSubmit)="saveRecurring()" class="form-v">
+    <div class="f">
+      <label>Name</label>
+      <input pInputText formControlName="name" placeholder="e.g., 3rd & 4th Saturday Off">
+    </div>
+    <div class="f">
+      <label>Color</label>
+      <div class="flex align-items-center gap-2">
+        <p-colorPicker formControlName="color" [format]="'hex'"></p-colorPicker>
+        <span class="swatch" [style.background]="displayColor(addRecurringForm.get('color')?.value)"></span>
+      </div>
+    </div>
+    <div class="f">
+      <label>Nths</label>
+      <p-multiSelect formControlName="nths" [options]="nthOptions" [display]="'chip'"></p-multiSelect>
+    </div>
+    <div class="f">
+      <label>Weekdays</label>
+      <p-multiSelect formControlName="weekdays"
+                     [options]="weekdayOptions"
+                     optionLabel="label" optionValue="value" [display]="'chip'">
+      </p-multiSelect>
+    </div>
+    <div class="f">
+      <label>Months</label>
+      <p-multiSelect formControlName="months"
+                     [options]="monthOptions"
+                     optionLabel="label" optionValue="value" [display]="'chip'">
+      </p-multiSelect>
+    </div>
+    <div class="actions">
+      <button pButton type="button" label="Cancel" class="p-button-text" (click)="showAddRecurring=false"></button>
+      <button pButton type="submit" label="Save Rule" icon="pi pi-check" [disabled]="addRecurringForm.invalid || saving"></button>
+    </div>
+  </form>
+</p-dialog>
+
+<!-- Add Multiple Holidays (now with Calendar + Color pickers) -->
+<p-dialog header="Add Multiple Holidays" [(visible)]="showAddMultiple" [modal]="true" [style]="{width:'820px'}">
+  <form [formGroup]="bulkForm" (ngSubmit)="saveMultiple()" class="form-v">
+    <!-- 👇 provide the context for [formGroupName]="i" -->
+    <div formArrayName="rows">
+      <p-table [value]="rows.controls" [paginator]="false" styleClass="p-datatable-sm">
+        <ng-template pTemplate="header">
+          <tr>
+            <th>Name *</th>
+            <th>Date *</th>
+            <th>Color</th>
+            <th>Govt?</th>
+            <th>Enabled?</th>
+            <th class="text-right">
+              <button pButton type="button" icon="pi pi-plus" class="p-button-text" (click)="addRow()"></button>
+            </th>
+          </tr>
+        </ng-template>
+
+        <ng-template pTemplate="body" let-row let-i="rowIndex">
+          <!-- 👇 now this works because of the parent formArrayName -->
+          <tr [formGroupName]="i">
+            <td>
+              <input pInputText formControlName="name" placeholder="Holiday"/>
+            </td>
+
+            <td>
+              <p-calendar formControlName="date"
+                          [showIcon]="true"
+                          [touchUI]="true"
+                          appendTo="body"
+                          dateFormat="yy-mm-dd">
+              </p-calendar>
+            </td>
+
+            <td>
+              <div class="flex align-items-center gap-2">
+                <p-colorPicker formControlName="color" [format]="'hex'"></p-colorPicker>
+                <span class="swatch" [style.background]="displayColor(rows.at(i).value?.color)"></span>
+              </div>
+            </td>
+
+            <td class="text-center">
+              <input type="checkbox" formControlName="isGovernment"/>
+            </td>
+            <td class="text-center">
+              <input type="checkbox" formControlName="isEnabled"/>
+            </td>
+
+            <td class="text-right">
+              <button pButton type="button" icon="pi pi-trash" class="p-button-text p-button-danger" (click)="removeRow(i)"></button>
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+
+    <div class="actions">
+      <div class="flex-1"></div>
+      <button pButton type="button" label="Cancel" class="p-button-text" (click)="showAddMultiple=false"></button>
+      <button pButton type="submit" label="Save All" icon="pi pi-check" [disabled]="rows.length===0 || saving"></button>
+    </div>
+  </form>
+</p-dialog>
+
+
+<!-- Bulk Import (CSV/XLSX) -->
+<p-dialog header="Bulk Import (CSV / Excel)" [(visible)]="showImportBulk" [modal]="true" [style]="{width:'560px'}">
+  <div class="form-v">
+    <p>Upload a <strong>.csv</strong> or <strong>.xlsx</strong> with columns:</p>
+    <pre class="surface-100 p-2 border-round" style="white-space: pre-wrap">
+name,date,color,isGovernment,isEnabled,kind,nths,weekdays,months,startDate
+(Use either a concrete "date" OR recurrence fields "kind,nths,weekdays,months,startDate")
+    </pre>
+
+    <div class="flex gap-2">
+      <button pButton type="button" label="Download CSV Template" icon="pi pi-download" class="p-button-text" (click)="downloadCsvTemplate()"></button>
+      <button pButton type="button" label="Download Excel Template" icon="pi pi-file-excel" class="p-button-text" (click)="downloadExcelTemplate()"></button>
+    </div>
+
+    <input type="file"
+           (change)="onBulkFileChange($event)"
+           accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" />
+
+    <div class="actions">
+      <button pButton type="button" label="Cancel" class="p-button-text" (click)="showImportBulk=false"></button>
+      <button pButton type="button" label="Upload" icon="pi pi-upload" (click)="uploadBulk()" [disabled]="!bulkFile || saving"></button>
+    </div>
+  </div>
+</p-dialog>

@@ -1,0 +1,47 @@
+<div class="card">
+  <div class="p-grid mb-3">
+    <!-- Year Input -->
+    <div class="p-col-3">
+      <input type="number"
+             [(ngModel)]="year"
+             placeholder="Year"
+             style="width: 100%" />
+    </div>
+
+    <!-- Month Input -->
+    <div class="p-col-3">
+      <input type="number"
+             [(ngModel)]="month"
+             placeholder="Month (1-12)"
+             style="width: 100%" />
+    </div>
+
+    <!-- Generate Button -->
+    <div class="p-col-3">
+      <button pButton label="Generate Report"
+              icon="pi pi-search"
+              (click)="loadSummary()"></button>
+    </div>
+  </div>
+
+  <!-- Table -->
+  <p-table [value]="summaryList" [loading]="loading">
+    <ng-template pTemplate="header">
+      <tr>
+        <th>User</th>
+        <th>Email</th>
+        <th>Present Days</th>
+        <th>Absent Days</th>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="body" let-s>
+      <tr>
+        <td>{{ s.user?.name }}</td>
+        <td>{{ s.user?.email }}</td>
+        <td>{{ s.presentDays }}</td>
+        <td>{{ s.absentDays }}</td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>

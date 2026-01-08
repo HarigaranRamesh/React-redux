@@ -1,0 +1,169 @@
+:host {
+  display: block;
+  /* Tweak these if your theme uses different CSS vars */
+  --glass-bg: rgba(17, 24, 39, 0.55);
+  --glass-border: rgba(255, 255, 255, 0.08);
+  --glass-card: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
+  --accent-cyan: #22d3ee;
+  --accent-indigo: #6366f1;
+  --muted: #e5e7eb;
+  --text: #ffffff;
+}
+
+/* ---------- layout wrappers ---------- */
+.planner-wrap {
+  display: grid;
+  gap: 1rem;
+}
+
+.glassy {
+  background: var(--glass-bg);
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--glass-border);
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(2, 6, 23, 0.35);
+}
+
+/* ---------- header ---------- */
+.planner-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: .75rem 1rem;
+
+  .title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    letter-spacing: .3px;
+    color: var(--text);
+  }
+  .subtitle {
+    opacity: .85;
+    font-size: .9rem;
+    color: var(--muted);
+  }
+  .lh { display: flex; flex-direction: column; gap: 4px; }
+  .rh { display: flex; align-items: center; gap: .5rem; }
+}
+
+/* ---------- main content: calendar + rules ---------- */
+.planner-content {
+  display: grid;
+  grid-template-columns: 1fr 360px;
+  gap: 1rem;
+
+  @media (max-width: 992px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ---------- calendar ---------- */
+.calendar {
+  padding: .5rem 1rem 1rem;
+  overflow: hidden;
+}
+
+/* IMPORTANT: force CSS Grid; avoid PrimeFlex collisions */
+.week-head,
+.month-grid {
+  display: grid !important;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: .5rem;
+}
+
+.head-cell {
+  text-align: center;
+  font-weight: 600;
+  opacity: .9;
+  color: var(--muted);
+  user-select: none;
+}
+
+.day-cell {
+  position: relative;
+  padding: .5rem;
+  min-height: 92px;
+  border-radius: 12px;
+  background: var(--glass-card);
+  border: 1px solid rgba(255,255,255,0.06);
+  transition: transform .15s ease, box-shadow .15s ease, border-color .15s ease;
+  cursor: pointer;
+
+  &:hover {
+    transform: translateY(-2px);
+    border-color: rgba(34,211,238,.5);
+    box-shadow: 0 6px 20px rgba(34,211,238,.2);
+  }
+
+  &.out { opacity: .45; }
+
+  &.today {
+    border-color: rgba(99,102,241,.9);
+    box-shadow: 0 8px 26px rgba(99,102,241,.25);
+  }
+
+  .date {
+    font-weight: 700;
+    color: var(--text);
+    user-select: none;
+  }
+
+  .chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: .5rem;
+
+    .chip {
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-size: .72rem;
+      color: #051923;
+      background: #10b981;                 /* overridden inline per holiday color */
+      box-shadow: 0 0 12px rgba(16,185,129,.6);
+      text-shadow: 0 0 10px rgba(255,255,255,.35);
+      white-space: nowrap;
+      max-width: 100%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  }
+}
+
+/* ---------- rules side panel ---------- */
+.rules {
+  padding: .75rem 1rem 1rem;
+
+  .rules-head { margin: .25rem 0 1rem 0; }
+  .rules-title { font-weight: 700; font-size: 1.05rem; color: var(--text); }
+  .rules-sub { opacity: .8; font-size: .85rem; color: var(--muted); }
+}
+
+.color-dot {
+  display: inline-block;
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  margin-right: 8px;
+  box-shadow: 0 0 10px currentColor;
+}
+
+.text-right { text-align: right; }
+.ml-2 { margin-left: .5rem; }
+
+/* ---------- dialog forms ---------- */
+.form-v { display: flex; flex-direction: column; gap: 1rem; }
+.f { display: flex; flex-direction: column; gap: .35rem; }
+.actions { display: flex; justify-content: flex-end; gap: .5rem; }
+
+/* ---------- subtle scrollbar for lots of rules (optional) ---------- */
+.rules p-table .p-datatable-wrapper {
+  max-height: 60vh;
+  overflow: auto;
+}
+
+/* ---------- optional: compact buttons in header on narrow widths ---------- */
+@media (max-width: 576px) {
+  .planner-header .rh > *:not(:first-child) {
+    transform: scale(.95);
+  }
+}

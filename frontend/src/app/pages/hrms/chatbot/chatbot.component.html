@@ -1,0 +1,24 @@
+<div class="chat-wrapper">
+  <div class="chat-header">
+    <h3>HR Assistant</h3>
+  </div>
+
+  <div class="chat-body">
+    <div *ngFor="let msg of messages" [ngClass]="msg.role">
+      <div class="msg-bubble">{{ msg.text }}</div>
+    </div>
+  </div>
+
+  <div class="chat-footer">
+    <input
+      type="text"
+      pInputText
+      [(ngModel)]="userInput"
+      placeholder="Type your question..."
+      (keyup.enter)="send()"
+    />
+    <button pButton icon="pi pi-send" (click)="send()"></button>
+  </div>
+</div>
+
+<p-toast></p-toast>

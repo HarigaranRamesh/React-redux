@@ -1,0 +1,77 @@
+<p-toolbar class="mb-4">
+  <ng-template #start>
+    <p-button label="New" icon="pi pi-plus" class="mr-2" (onClick)="openNew()" />
+  </ng-template>
+</p-toolbar>
+
+<p-table #dt [value]="claims" [rows]="10" [paginator]="true" dataKey="id" [rowHover]="true"
+         currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+         [showCurrentPageReport]="true">
+  <ng-template #caption>
+    <div class="flex justify-between items-center">
+      <h5 class="m-0">Manage Petrol Reimbursements</h5>
+    </div>
+  </ng-template>
+
+  <ng-template #header>
+    <tr>
+      <th>Amount</th>
+      <th>From</th>
+      <th>To</th>
+      <th>Purpose</th>
+      <th>Kms</th>
+      <th>Mode</th>
+      <th>Date</th>
+      <th>Status</th>
+      <!-- <th>Approved By</th> -->
+
+    </tr>
+  </ng-template>
+
+  <ng-template #body let-claim>
+    <tr>
+      <td>{{ claim.amount }}</td>
+      <td>{{ claim.from }}</td>
+      <td>{{ claim.to }}</td>
+      <td>{{ claim.purposeofVisit }}</td>
+      <td>{{ claim.kms }}</td>
+      <td>{{ claim.modeoftransport }}</td>
+      <td>{{ claim.updatedAt | date:'dd/MM/yyyy' }}</td>
+      <td [ngSwitch]="claim.approved">
+  <span *ngSwitchCase="true"  class="text-success">Approved</span>
+  <span *ngSwitchCase="false" class="text-danger">Rejected</span>
+  <span *ngSwitchDefault      class="text-warning">Pending</span>
+</td>
+      <!-- <td>{{ claim.approvedBy}}</td> -->
+
+    </tr>
+  </ng-template>
+</p-table>
+
+
+<!-- Add/Edit Dialog -->
+<p-dialog [(visible)]="claimDialog" [style]="{ width: '850px', height: 'auto' }" header="Bulk Petrol Claims" [modal]="true">
+  <ng-template #content>
+    <br>
+    <div *ngFor="let row of claimList; let i = index" class="grid grid-cols-7 gap-2 mb-3 items-center">
+      <p-inputNumber [(ngModel)]="row.amount" placeholder="Amount" [min]="0"></p-inputNumber>
+      <input pInputText [(ngModel)]="row.from" placeholder="From" />
+      <input pInputText [(ngModel)]="row.to" placeholder="To" />
+      <input pInputText [(ngModel)]="row.purposeofVisit" placeholder="Purpose" />
+      <p-inputNumber [(ngModel)]="row.kms" placeholder="Kms" [min]="0"></p-inputNumber>
+      <p-dropdown appendTo="body" [options]="transportModes"  [(ngModel)]="row.modeoftransport" placeholder="Select Mode"></p-dropdown>
+      <p-calendar appendTo="body" [(ngModel)]="row.updatedAt" dateFormat="dd/mm/yy" showIcon></p-calendar>
+      <p-button icon="pi pi-trash" severity="danger" (click)="removeRow(i)" [disabled]="claimList.length === 1"></p-button>
+    </div>
+
+    <p-button icon="pi pi-plus" label="Add Row" (click)="addRow()" />
+  </ng-template>
+
+  <ng-template #footer>
+    <p-button label="Cancel" icon="pi pi-times" text (click)="claimDialog=false" />
+    <p-button label="Save All" icon="pi pi-check" (click)="saveBulkClaims()" />
+  </ng-template>
+</p-dialog>
+
+
+<p-confirmDialog [style]="{ width: '450px' }"></p-confirmDialog>

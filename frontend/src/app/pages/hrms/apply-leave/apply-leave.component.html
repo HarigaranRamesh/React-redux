@@ -1,0 +1,72 @@
+<p-toast></p-toast>
+
+<form [formGroup]="leaveForm" (ngSubmit)="submitLeaveRequest()" class="p-fluid formgrid grid p-3">
+  <!-- Leave Type -->
+  <div class="field col-12 md:col-6">
+    <p-floatLabel variant="on">
+      <p-dropdown
+        id="leaveType"
+        [options]="leaveTypes"
+        formControlName="leaveType"
+        styleClass="w-full">
+      </p-dropdown>
+      <label for="leaveType">Leave Type</label>
+    </p-floatLabel>
+  </div>
+
+  <!-- Start Date -->
+  <div class="field col-12 md:col-6">
+    <p-floatLabel variant="on">
+      <p-datepicker
+        id="startDate"
+        formControlName="startDate"
+        [showIcon]="true"
+        appendTo="body"
+        dateFormat="dd/mm/yy"
+        [disabledDates]="disabledDatesStart"
+        (onMonthChange)="onStartMonthChange($event)"
+        (onSelect)="onStartSelect($event)"
+        styleClass="w-full">
+      </p-datepicker>
+      <label for="startDate">Start Date</label>
+    </p-floatLabel>
+  </div>
+
+  <!-- End Date -->
+  <div class="field col-12 md:col-6">
+    <p-floatLabel variant="on">
+      <p-datepicker
+        id="endDate"
+        formControlName="endDate"
+        [showIcon]="true"
+        appendTo="body"
+        dateFormat="dd/mm/yy"
+        [minDate]="leaveForm.value.startDate"
+        [disabledDates]="disabledDatesEnd"
+        (onMonthChange)="onEndMonthChange($event)"
+        (onSelect)="onEndSelect($event)"
+        styleClass="w-full">
+      </p-datepicker>
+      <label for="endDate">End Date</label>
+    </p-floatLabel>
+  </div>
+
+  <!-- Reason -->
+  <div class="field col-12">
+    <p-floatLabel variant="on">
+      <textarea
+        id="reason"
+        pInputTextarea
+        rows="3"
+        formControlName="reason"
+        class="w-full">
+      </textarea>
+      <label for="reason">Reason</label>
+    </p-floatLabel>
+  </div>
+
+  <!-- Submit -->
+  <div class="field col-12 mt-3 flex justify-content-end">
+    <button pButton type="submit" label="Submit Leave Request" [disabled]="leaveForm.invalid"></button>
+  </div>
+</form>

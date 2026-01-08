@@ -1,0 +1,128 @@
+<p-toast></p-toast>
+
+<div class="surface-card border-round shadow-2 p-3">
+  <!-- Add Role (inline) -->
+  <div class="flex align-items-end gap-3 mb-3">
+    <div class="flex-1">
+      <label class="block mb-2 text-500 text-sm">Add Role (Leave Policy)</label>
+      <div class="flex gap-2">
+        <input
+          type="text"
+          pInputText
+          placeholder="e.g., SENIOR ENGINEER"
+          [(ngModel)]="newRoleName"
+          class="flex-1"
+        />
+        <button pButton label="Add Role" icon="pi pi-plus" (click)="addRole()"></button>
+      </div>
+      <small class="text-600">After adding a role, use “Add Row” to create its policies, then “Save All”.</small>
+    </div>
+  </div>
+
+  <!-- Role selector (from LeavePolicy distinct roles) -->
+  <div class="flex align-items-end gap-3 mb-4">
+    <div class="flex-1">
+      <label class="block mb-2 text-500 text-sm">Select Role</label>
+      <p-dropdown
+        [options]="policyRoles"
+        [(ngModel)]="selectedRoleName"
+        placeholder="Choose role"
+        (onChange)="onRoleChange()"
+        [showClear]="true"
+      >
+        <ng-template let-opt pTemplate="item">
+          <div>{{ opt }}</div>
+        </ng-template>
+        <ng-template let-opt pTemplate="selectedItem">
+          <div>{{ opt || 'Choose role' }}</div>
+        </ng-template>
+      </p-dropdown>
+    </div>
+
+    <div class="flex gap-2">
+      <button
+        pButton
+        label="Add Row"
+        icon="pi pi-plus"
+        (click)="addNewRow()"
+        [disabled]="!selectedRoleName"
+      ></button>
+      <button
+        pButton
+        label="Save All"
+        icon="pi pi-save"
+        class="p-button-success"
+        (click)="saveAllNew()"
+        [disabled]="!newRows.length"
+      ></button>
+    </div>
+  </div>
+
+  <!-- Existing policies table -->
+  <p-table [value]="policies" *ngIf="selectedRoleName">
+    <ng-template pTemplate="header">
+      <tr>
+        <th style="width: 240px">Label</th>
+        <th style="width: 180px">Accrual</th>
+        <th style="width: 160px">Amount (days)</th>
+        <th style="width: 180px">Actions</th>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="body" let-row>
+      <tr>
+        <td>
+          <p-dropdown [options]="labels" [(ngModel)]="row.label"></p-dropdown>
+        </td>
+        <td>
+          <p-dropdown [options]="accrualTypes" [(ngModel)]="row.accrualType"></p-dropdown>
+        </td>
+        <td>
+          <p-inputNumber [(ngModel)]="row.amount" [min]="0" [useGrouping]="false"></p-inputNumber>
+        </td>
+        <td class="flex gap-2">
+          <button pButton icon="pi pi-save" class="p-button-text" (click)="saveExisting(row)" title="Save"></button>
+          <button
+            pButton
+            icon="pi pi-trash"
+            class="p-button-text p-button-danger"
+            (click)="deletePolicy(row)"
+            title="Delete"
+          ></button>
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+
+  <!-- New rows editor (multi-add) -->
+  <div class="mt-4" *ngIf="newRows.length">
+    <h5 class="mb-3">Add Policy for {{ selectedRoleName }}</h5>
+
+    <div class="grid" *ngFor="let r of newRows; let i = index">
+      <div class="col-12 md:col-3">
+        <label class="block mb-2">Label</label>
+        <p-dropdown [options]="labels" [(ngModel)]="r.label"></p-dropdown>
+      </div>
+
+      <div class="col-12 md:col-3">
+        <label class="block mb-2">Accrual</label>
+        <p-dropdown [options]="accrualTypes" [(ngModel)]="r.accrualType"></p-dropdown>
+      </div>
+
+      <div class="col-12 md:col-3">
+        <label class="block mb-2">Amount (days)</label>
+        <p-inputNumber [(ngModel)]="r.amount" [min]="0" [useGrouping]="false"></p-inputNumber>
+      </div>
+
+      <div class="col-12 md:col-3 flex align-items-end justify-content-end">
+        <button
+          pButton
+          icon="pi pi-times"
+          class="p-button-text p-button-danger"
+          (click)="removeNewRow(i)"
+          title="Remove row"
+        ></button>
+      </div>
+    </div>
+  </div>
+</div>

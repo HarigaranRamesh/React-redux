@@ -1,0 +1,38 @@
+<div class="container">
+  <div #certificate class="certificate">
+
+    <!-- PROFILE PHOTO -->
+    <img class="photo" [src]="user?.profilepic" alt="User photo" />
+
+    <!-- FULL NAME -->
+    <h2 class="username">{{ user?.user_name }}</h2>
+
+    <!-- ROLE / POSITION -->
+    <p class="role">{{ user?.designation || user?.position }}</p>
+
+    <!-- INFO BLOCK -->
+    <div class="info">
+      <p>ID NO: {{ user?.empId }}</p>
+      <p>DOB: {{ user?.dob | date:'dd-MM-yyyy' }}</p>
+      <p>Phone: {{ user?.mobile_no }}</p>
+      <p>E-mail: {{ user?.email }}</p>
+      <p>Join Date: {{ user?.doj | date:'dd-MM-yyyy' }}</p>
+      <p *ngIf="user?.expireDate">Expire Date: {{ user?.expireDate | date:'dd-MM-yyyy' }}</p>
+    </div>
+
+    <!-- BARCODE IF USED -->
+    <!-- <svg #barcodeSvg id="barcode"></svg> -->
+  </div>
+
+  <br />
+
+  <!-- BACK SIDE OF CARD -->
+  <div #certificateBack class="certificateBack"></div>
+
+  <br />
+
+  <!-- DOWNLOAD BUTTON -->
+  <div class="input-container">
+    <button pButton label="Download PDF" (click)="downloadPDF()"></button>
+  </div>
+</div>

@@ -1,0 +1,30 @@
+<div class="payslip-container">
+  <div class="selection-form">
+    <h2>Generate Payslip</h2>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label for="monthPicker">Select Month:</label>
+        <p-calendar
+          id="monthPicker"
+          [(ngModel)]="selectedMonth"
+          view="month"
+          dateFormat="MM yy"
+          [showIcon]="true"
+          [yearNavigator]="true"
+          [yearRange]="'2020:2030'">
+        </p-calendar>
+      </div>
+
+      <div class="form-group">
+        <p-button
+          label="Generate Payslip"
+          icon="pi pi-file-pdf"
+          (onClick)="generatePayslip()"
+          [loading]="loading"
+          [disabled]="!selectedMonth">
+        </p-button>
+      </div>
+    </div>
+  </div>
+</div>

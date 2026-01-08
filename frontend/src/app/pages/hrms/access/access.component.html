@@ -1,0 +1,59 @@
+<div class="flex flex-column md:flex-row gap-3 p-4 surface-ground">
+  <!-- Left Panel: Tree -->
+  <div class="w-full md:w-1/3">
+    <div class="surface-card shadow-2 border-round p-3 h-full">
+      <h4 class="mb-3 text-primary">📂 Role Hierarchy</h4>
+
+      <p-tree
+        [value]="treeData"
+        class="w-full"
+        [draggableNodes]="true"
+        [droppableNodes]="true"
+        draggableScope="self"
+        droppableScope="self"
+        selectionMode="single"
+        [(selection)]="selectedNode"
+        (onNodeDrop)="handleDrop($event)">
+      </p-tree>
+
+      <div *ngIf="selectedNode" class="mt-4 p-3 surface-100 border-round text-sm text-primary font-medium">
+        <i class="pi pi-user mr-2"></i>Selected: {{ selectedNode.label }}
+      </div>
+    </div>
+  </div>
+
+  <!-- Right Panel: Organization Chart -->
+ <!-- Right Panel: Organization Chart -->
+<div class="w-full md:w-2/3">
+  <div class="surface-card shadow-2 border-round p-3">
+    <h4 class="mb-3 text-primary">👥 Organization Chart</h4>
+
+    <!-- ⤵️ Horizontal scroll wrapper -->
+    <div class="org-scroll">
+      <div class="org-inner">
+        <p-organization-chart [value]="orgData" [collapsible]="true">
+          <ng-template let-node pTemplate="default">
+            <div class="flex flex-column align-items-center text-center px-3 py-4">
+              <img
+                [src]="getAvatarUrl(node.data?.name || node.label, node.data?.photo)"
+                class="border-circle mb-2 shadow-1"
+                width="64" height="64" style="object-fit: cover;"
+                [alt]="node.label || 'User'"
+              />
+              <div class="font-semibold text-base text-primary">{{ node.label }}</div>
+
+              <ul *ngIf="node.data?.users?.length" class="text-sm mt-2 list-none p-0 w-full">
+                <li *ngFor="let user of node.data.users"
+                    class="py-1 px-2 border-round hover:surface-200 transition-all cursor-pointer">
+                  👤 {{ user.name }}
+                </li>
+              </ul>
+            </div>
+          </ng-template>
+        </p-organization-chart>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div>

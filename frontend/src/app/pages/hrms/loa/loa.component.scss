@@ -1,0 +1,29 @@
+.provisional-offer {
+  font-family: 'Arial', sans-serif;
+  font-size: 14px;
+  color: #333;
+
+  h3, h4, h5 {
+    color: #1a1a1a;
+    margin-top: 1.5rem;
+  }
+
+  .salary-table th, .salary-table td {
+    border: 1px solid #ccc;
+  }
+
+  .signature {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-top: 2rem;
+  }
+
+  .logo {
+    max-height: 80px;
+  }
+
+  .sign-img {
+    max-height: 60px;
+  }
+}

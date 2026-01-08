@@ -1,0 +1,120 @@
+<p-tabView>
+  <!-- Apply Leave Tab -->
+  <p-tabPanel header="Apply Leave">
+    <form [formGroup]="leaveForm" (ngSubmit)="submitLeaveRequest()" class="p-fluid formgrid grid p-3">
+
+      <!-- Leave Type -->
+      <div class="field col-12 md:col-6">
+        <p-floatLabel variant="on">
+          <p-dropdown
+            id="leaveType"
+            [options]="leaveTypes"
+            formControlName="leaveType"
+            styleClass="w-full"
+            (onChange)="onLeaveTypeChange($event)">
+          </p-dropdown>
+          <label for="leaveType">Leave Type</label>
+        </p-floatLabel>
+      </div>
+
+      <!-- Start Date -->
+      <div class="field col-12 md:col-6">
+        <p-floatLabel variant="on">
+          <p-datepicker
+            id="startDate"
+            formControlName="startDate"
+            dateFormat="dd/mm/yy"
+            [showIcon]="true"
+            styleClass="w-full"
+            [minDate]="minStartDate"
+            [disabledDates]="disabledDatesStart"
+            appendTo="body"
+            (onMonthChange)="onStartMonthChange($event)"
+            (onSelect)="onStartSelect($event)">
+          </p-datepicker>
+          <label for="startDate">Start Date</label>
+        </p-floatLabel>
+      </div>
+
+      <!-- End Date -->
+      <div class="field col-12 md:col-6">
+        <p-floatLabel variant="on">
+          <p-datepicker
+            id="endDate"
+            formControlName="endDate"
+            dateFormat="dd/mm/yy"
+            [showIcon]="true"
+            styleClass="w-full"
+            [minDate]="leaveForm.value.startDate || minStartDate"
+            [disabledDates]="disabledDatesEnd"
+            appendTo="body"
+            (onMonthChange)="onEndMonthChange($event)"
+            (onSelect)="onEndSelect($event)">
+          </p-datepicker>
+          <label for="endDate">End Date</label>
+        </p-floatLabel>
+      </div>
+
+      <!-- Reason -->
+      <div class="field col-12">
+        <p-floatLabel variant="on">
+          <textarea
+            id="reason"
+            pInputTextarea
+            rows="3"
+            formControlName="reason"
+            class="w-full">
+          </textarea>
+          <label for="reason">Reason</label>
+        </p-floatLabel>
+      </div>
+
+      <!-- ✅ Optional Medical Certificate (only for Sick Leave) -->
+      <div class="field col-12 md:col-6" *ngIf="leaveForm.value.leaveType === 'Sick Leave'">
+        <label class="block mb-2 font-semibold">Medical Certificate (optional)</label>
+        <p-fileUpload
+          mode="basic"
+          name="medicalCertificate"
+          accept=".pdf,.jpg,.jpeg,.png"
+          [auto]="false"
+          chooseLabel="Attach File"
+          (onSelect)="onFileSelect($event)">
+        </p-fileUpload>
+        <small class="text-color-secondary">Attach your medical certificate if available.</small>
+      </div>
+
+      <!-- Submit Button -->
+      <div class="field col-12 mt-3 flex justify-content-end">
+        <button pButton type="submit" label="Submit Leave Request" [disabled]="leaveForm.invalid"></button>
+      </div>
+    </form>
+  </p-tabPanel>
+
+  <!-- ✅ Leave Requests List Tab -->
+  <p-tabPanel header="My Leave Requests">
+    <p-table [value]="leaveRequests" [paginator]="true" [rows]="5" responsiveLayout="scroll">
+      <ng-template pTemplate="header">
+        <tr>
+          <th>Date</th>
+          <th>Leave Type</th>
+          <th>Reason</th>
+          <th>Status</th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-request>
+        <tr>
+          <td>{{ request.date | date:'dd/MM/yyyy' }}</td>
+          <td>{{ request.attendanceType }}</td>
+          <td>{{ request.reasonForApplying }}</td>
+          <td>
+            <span *ngIf="request.approved === true" class="text-green-500">Approved</span>
+            <span *ngIf="request.approved === false" class="text-red-500">Rejected</span>
+            <span *ngIf="request.approved === null" class="text-orange-500">Pending</span>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </p-tabPanel>
+</p-tabView>
+
+<p-toast></p-toast>

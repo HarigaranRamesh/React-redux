@@ -1,0 +1,125 @@
+{
+  "_id": {
+    "$oid": "6884cc051725e1465c06c2af"
+  },
+  "role": "Super Admin",
+  "main": [
+    {
+      "menuName": "Dashboard",
+      "children": [
+        {
+          "submenuName": "Dashboard",
+          "_id": {
+            "$oid": "689719c64ee1f0a401251bb2"
+          }
+        }
+      ],
+      "_id": {
+        "$oid": "689719c64ee1f0a401251bb1"
+      }
+    },
+    {
+      "menuName": "Access",
+      "children": [
+        {
+          "submenuName": "Access",
+          "_id": {
+            "$oid": "689719c64ee1f0a401251bb4"
+          }
+        },
+        {
+          "submenuName": "Access Define",
+          "_id": {
+            "$oid": "689719c64ee1f0a401251bb5"
+          }
+        }
+      ],
+      "_id": {
+        "$oid": "689719c64ee1f0a401251bb3"
+      }
+    },
+    {
+      "menuName": "User Management",
+      "children": [
+        {
+          "submenuName": "Add User",
+          "_id": {
+            "$oid": "689719c64ee1f0a401251bb7"
+          }
+        },
+        {
+          "submenuName": "View Users",
+          "_id": {
+            "$oid": "689719c64ee1f0a401251bb8"
+          }
+        }
+      ],
+      "_id": {
+        "$oid": "689719c64ee1f0a401251bb6"
+      }
+    },
+    {
+      "menuName": "Reports",
+      "children": [
+        {
+          "submenuName": "Daily Report",
+          "_id": {
+            "$oid": "689719c64ee1f0a401251bba"
+          }
+        },
+        {
+          "submenuName": "Monthly Report",
+          "_id": {
+            "$oid": "689719c64ee1f0a401251bbb"
+          }
+        }
+      ],
+      "_id": {
+        "$oid": "689719c64ee1f0a401251bb9"
+      }
+    },
+     {
+      "menuName": "Leave Policy",
+      "children": [
+        {
+          "submenuName": "Yearly Leave Policy",
+          "_id": {
+            "$oid": "689719c64ee1f0a411251bba"
+          }
+        }
+      ],
+      "_id": {
+        "$oid": "689719c64ee1f0a401251bb9"
+      }
+    },
+    {
+      "menuName": "Employee's Approval",
+      "children": [
+        {
+          "submenuName": "Employee Leave Approval",
+          "_id": {
+            "$oid": "689719c64ee1f0a401251bbd"
+          }
+        },
+        {
+          "submenuName": "Employee Petrol Approval",
+          "_id": {
+            "$oid": "689719c64ee1f0a401251bbe"
+          }
+        }
+      ],
+      "_id": {
+        "$oid": "689719c64ee1f0a401251bbc"
+      }
+    }
+  ],
+  "access": [
+    {
+      "$oid": "6884cc051725e1465c06c2af"
+    }
+  ],
+  "members": [],
+  "updatedAt": {
+    "$date": "2025-08-09T09:49:58.842Z"
+  }
+}

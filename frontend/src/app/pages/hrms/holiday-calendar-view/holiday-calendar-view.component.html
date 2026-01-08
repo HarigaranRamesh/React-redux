@@ -1,0 +1,41 @@
+<p-toast></p-toast>
+
+<div class="calendar-view-wrap">
+  <!-- Header -->
+  <div class="calendar-view-header glassy">
+    <div class="lh">
+      <div class="title">Holiday Calendar</div>
+      <div class="subtitle">{{ monthName(month()) }} {{ year() }}</div>
+    </div>
+
+    <div class="rh">
+      <button pButton icon="pi pi-angle-left" class="p-button-rounded p-button-text" (click)="prevMonth()" pTooltip="Previous month"></button>
+      <button pButton icon="pi pi-angle-right" class="p-button-rounded p-button-text" (click)="nextMonth()" pTooltip="Next month"></button>
+    </div>
+  </div>
+
+  <!-- Calendar -->
+  <div class="calendar glassy">
+    <div class="week-head">
+      <div *ngFor="let w of weekLabels" class="head-cell">{{ w }}</div>
+    </div>
+
+    <!-- Month grid -->
+    <div class="month-grid">
+      <div *ngFor="let c of grid()"
+           class="day-cell"
+           [class.out]="!c.inMonth"
+           [class.today]="c.isToday">
+        <div class="date">{{ c.date.getDate() }}</div>
+
+        <div class="chips" *ngIf="c.holidays.length">
+          <span class="chip" *ngFor="let h of c.holidays"
+                [style.background]="h.color || '#10b981'"
+                [pTooltip]="h.name" tooltipPosition="top">
+            {{ h.name | slice:0:10 }}<span *ngIf="h.name.length>10">…</span>
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
